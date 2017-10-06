@@ -6,12 +6,9 @@
 
 using namespace std;
 
+#include "evaluate.h"
 #include "key.h"
 #include "window.h"
-
-bool evaluate(char c) {
-    return true;
-}
 
 void redisplay() {
 }
@@ -19,6 +16,8 @@ void redisplay() {
 int main(int argc, const char* argv[]) {
     Window window;
     Key key;
+    Subeditor subeditor;
+    Evaluate evaluate(&subeditor);
         
     window.init("Editor");
     key.init();
