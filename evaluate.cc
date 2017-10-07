@@ -10,7 +10,7 @@ using namespace std;
 #include "subeditor.h"
 
 Evaluate::Evaluate(Subeditor* subeditor) : _keymap {
-    { 'q', &Subeditor::quit }
+    { 0x11, &Subeditor::quit }
 }, _subeditor{subeditor} {
 }
 

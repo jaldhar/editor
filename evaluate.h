@@ -9,8 +9,8 @@
 
 #include <functional>
 #include <map>
-#include "subeditor.h"
 
+class Subeditor;
 using COMMAND = 
   std::function<bool(Subeditor*, bool& isArg, int& arg, bool& isExit, char c)>;
 

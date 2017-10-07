@@ -10,9 +10,10 @@ using namespace std;
 #include "key.h"
 
 bool Key::init() {
-    cbreak();
+    raw();
     noecho();
     nonl();
+    idlok(stdscr, TRUE);
     keypad(stdscr, TRUE);
     intrflush(stdscr, FALSE);
     nodelay(stdscr, FALSE);
