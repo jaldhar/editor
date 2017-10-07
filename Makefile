@@ -11,6 +11,7 @@ PROGRAM=editor
 OBJECTS=editor.o \
 	evaluate.o \
 	key.o \
+	redisplay.o \
 	subeditor.o \
 	window.o
 

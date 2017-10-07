@@ -4,6 +4,7 @@
 // Copyright (C) 2017, Consolidated Braincells Inc. All rights reserved.
 // "Do what thou wilt" shall be the whole of the license.
 
+#include <cctype>
 using namespace std;
 
 #include "evaluate.h"
@@ -21,12 +22,17 @@ bool Evaluate::operator()(char c) {
 
     auto it = _keymap.find(c);
     if (it == _keymap.end()) {
-        return false;
-    }
-
-    while (!(it->second)(_subeditor, isArg, arg, isExit, c)) {
-        // c = _key.get();
-        // redisplay();
+        if (isprint(c)) {
+            if (!_subeditor->insertChar(c)) {
+                // _key.beep();
+            }
+            return false;
+        }
+    } else {
+        while (!(it->second)(_subeditor, isArg, arg, isExit, c)) {
+            // c = _key.get();
+            // redisplay();
+        }
     }
 
     return isExit;

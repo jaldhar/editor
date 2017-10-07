@@ -8,6 +8,8 @@ using namespace std;
 
 #include "evaluate.h"
 #include "key.h"
+#include "redisplay.h"
+#include "subeditor.h"
 #include "window.h"
 
 void redisplay() {
@@ -18,11 +20,12 @@ int main(int argc, const char* argv[]) {
     Key key;
     Subeditor subeditor;
     Evaluate evaluate(&subeditor);
-        
+    Redisplay redisplay(&subeditor);
     window.init("Editor");
     key.init();
     
     char c;
+    redisplay();
     while(true) {
         c = key.get();
         if (evaluate(c)) {
