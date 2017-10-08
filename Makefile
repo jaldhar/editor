@@ -4,6 +4,10 @@
 # Copyright (C) 2017, Consolidated Braincells Inc. All rights reserved.
 # "Do what thou wilt" shall be the whole of the license.
 
+.POSIX:
+
+.SUFFIXES: .cc
+
 CXX=c++
 CXXFLAGS=-std=c++14 -O2 -g -Wall -Wextra -Wpedantic -Wcast-qual -Wformat=2 -Wshadow -Wno-missing-field-initializers  -Wpointer-arith -Wcast-align -Wwrite-strings -Wno-unreachable-code -Wnon-virtual-dtor -Woverloaded-virtual
 LDFLAGS=-lncurses
@@ -15,13 +19,6 @@ OBJECTS=editor.o \
 	subeditor.o \
 	window.o
 
-.POSIX:
-
-.SUFFIXES: .cc
-
-.cc.o:
-	$(CXX) $(CXXFLAGS) -c -o $@ $^
-
 all: $(PROGRAM)
 
 $(PROGRAM): $(OBJECTS)
@@ -30,7 +27,12 @@ $(PROGRAM): $(OBJECTS)
 clean:
 	-rm *.o
 
-distclean:
+distclean: clean
 	-rm $(PROGRAM)
+
+.SUFFIXES: .cc .o
+
+.cc.o:
+	$(CXX) $(CXXFLAGS) -c -o $@ $^
 
 .PHONY: clean distclean
