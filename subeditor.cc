@@ -4,6 +4,7 @@
 // Copyright (C) 2017, Consolidated Braincells Inc. All rights reserved.
 // "Do what thou wilt" shall be the whole of the license.
 
+#include <iterator>
 using namespace std;
 
 #include "subeditor.h"
@@ -16,9 +17,14 @@ bool Subeditor::insertChar(char c) {
         return false;
     }
 
-    *_point++ = c;
+    *_point = c;
+    advance(_point, 1);
 
     return true;
+}
+
+int Subeditor::pointGet() {
+    return distance(_buffer.begin(), _point);
 }
 
 bool Subeditor::quit(bool& /*isArg*/, int& /*arg*/, bool& isExit, char /*c*/) {

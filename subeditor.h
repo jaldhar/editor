@@ -15,6 +15,7 @@ class Subeditor {
 public:
     Subeditor();
     bool insertChar(char c);
+    int pointGet();
     bool quit(bool& isArg, int& arg, bool& isExit, char c);
     // TODO: make these private.
     BUFFER _buffer;

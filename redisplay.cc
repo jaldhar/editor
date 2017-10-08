@@ -23,4 +23,5 @@ void Redisplay::operator()() {
             waddch(stdscr, '~' | A_BOLD);
         }
     }
+    wmove(stdscr, 1, _subeditor->pointGet());
 }
