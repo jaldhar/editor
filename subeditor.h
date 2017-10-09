@@ -9,17 +9,33 @@
 
 #include <array>
 
-using BUFFER = std::array<char, 80>;
+static constexpr size_t BUFFERSIZE = 80;
+using BUFFER = std::array<char, BUFFERSIZE>;
+using LOCATION = BUFFER::iterator;
 
 class Subeditor {
 public:
     Subeditor();
+    LOCATION bufferStart();
+    LOCATION bufferEnd();
+    LOCATION pointGet();
+    bool pointMove(int count);
+    // bool pointSet(LOCATION loc);
+
+    int compareLocations(LOCATION loc1, LOCATION loc2);
+    int locationToCount(LOCATION loc);
+    LOCATION countToLocation(int count);
+
     bool insertChar(char c);
-    int pointGet();
+    bool moveByCharacter(bool& isArg, int& arg, bool& isExit, char c);
+
+    bool insertACharacter(bool& isArg, int& arg, bool& isExit, char c);
+    bool moveBackwardACharacter(bool& isArg, int& arg, bool& isExit, char c);
+    bool moveForwardACharacter(bool& isArg, int& arg, bool& isExit, char c);
     bool quit(bool& isArg, int& arg, bool& isExit, char c);
-    // TODO: make these private.
+private:
     BUFFER _buffer;
-    BUFFER::iterator _point;
+    LOCATION _point;
 };
 
 #endif

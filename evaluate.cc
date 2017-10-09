@@ -7,11 +7,16 @@
 #include <cctype>
 using namespace std;
 
+#include <curses.h>
 #include "evaluate.h"
 #include "subeditor.h"
 
 Evaluate::Evaluate(Subeditor* subeditor) : _keymap {
-    { 0x11, &Subeditor::quit }
+    { 0x06, &Subeditor::moveForwardACharacter }, // CTRL-f
+    { KEY_RIGHT, &Subeditor::moveForwardACharacter },
+    { 0x02, &Subeditor::moveBackwardACharacter }, // CTRL-b
+    { KEY_LEFT, &Subeditor::moveBackwardACharacter },
+    { 0x11, &Subeditor::quit }, // CTRL-q
 }, _subeditor{subeditor} {
 }
 
@@ -23,7 +28,7 @@ bool Evaluate::operator()(char c) {
     auto it = _keymap.find(c);
     if (it == _keymap.end()) {
         if (isprint(c)) {
-            if (!_subeditor->insertChar(c)) {
+            if (!_subeditor->insertACharacter(isArg, arg, isExit, c)) {
                 // _key.beep();
             }
             return false;

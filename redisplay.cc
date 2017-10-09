@@ -4,6 +4,7 @@
 // Copyright (C) 2017, Consolidated Braincells Inc. All rights reserved.
 // "Do what thou wilt" shall be the whole of the license.
 
+#include <algorithm>
 #include <cctype>
 using namespace std;
 
@@ -16,12 +17,12 @@ Redisplay::Redisplay(Subeditor* subeditor) :  _subeditor{subeditor} {
 
 void Redisplay::operator()() {
     wmove(stdscr, 1 , 0);
-    for (auto& c: _subeditor->_buffer) {
+    for_each (_subeditor->bufferStart(), _subeditor->bufferEnd(), [](auto c) {
         if (isprint(c)) {
             waddch(stdscr, c);
         } else {
             waddch(stdscr, '~' | A_BOLD);
         }
-    }
-    wmove(stdscr, 1, _subeditor->pointGet());
+    });
+    wmove(stdscr, 1, _subeditor->locationToCount(_subeditor->pointGet()));
 }
