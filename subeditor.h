@@ -20,12 +20,13 @@ public:
     LOCATION bufferEnd();
     LOCATION pointGet();
     bool pointMove(int count);
-    // bool pointSet(LOCATION loc);
+    bool pointSet(LOCATION loc);
 
     int compareLocations(LOCATION loc1, LOCATION loc2);
-    int locationToCount(LOCATION loc);
-    LOCATION countToLocation(int count);
+    size_t locationToCount(LOCATION loc);
+    LOCATION countToLocation(size_t count);
 
+    char getChar();
     bool insertChar(char c);
     bool moveByCharacter(bool& isArg, int& arg, bool& isExit, char c);
 
@@ -33,9 +34,13 @@ public:
     bool moveBackwardACharacter(bool& isArg, int& arg, bool& isExit, char c);
     bool moveForwardACharacter(bool& isArg, int& arg, bool& isExit, char c);
     bool quit(bool& isArg, int& arg, bool& isExit, char c);
-private:
-    BUFFER _buffer;
-    LOCATION _point;
+    BUFFER   _buffer; // TODO: Make this private again.
+    size_t   _point;
+    size_t   _count;
+    LOCATION _gapStart;
+    LOCATION _gapEnd;
+
+    void moveGap();
 };
 
 #endif
