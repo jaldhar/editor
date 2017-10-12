@@ -13,6 +13,7 @@ CXXFLAGS=-std=c++14 -O2 -g -Wall -Wextra -Wpedantic -Wcast-qual -Wformat=2 -Wsha
 LDFLAGS=-lncurses
 PROGRAM=editor
 OBJECTS=editor.o \
+	buffer.o \
 	evaluate.o \
 	key.o \
 	redisplay.o \
