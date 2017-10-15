@@ -15,6 +15,14 @@
 static constexpr size_t BUFFERSIZE = 80;
 using BUFFER = std::array<char, BUFFERSIZE>;
 
+struct BufferInternals {
+    size_t _size;
+    size_t _point;
+    size_t _count;
+    size_t _gapStart;
+    size_t _gapEnd;
+};
+
 template<typename T> class BufferIterator;
 
 template<typename T>
@@ -98,6 +106,16 @@ public:
             std::swap(this->_gapStart, that._gapStart);
             std::swap(this->_gapEnd, that._gapEnd);
         }
+    }
+
+    BufferInternals internals()  {
+        return {
+            size(),
+            static_cast<size_t>(_point - begin()),
+            _count,
+            static_cast<size_t>(_gapStart - begin()),
+            static_cast<size_t>(_gapEnd - begin())
+        };
     }
 
 private:
