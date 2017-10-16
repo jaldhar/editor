@@ -28,6 +28,7 @@ template<typename T> class BufferIterator;
 template<typename T>
 class Buffer {
 public:
+    using iterator = BufferIterator<T>;
 
     Buffer() : _text{0}, _point{*this, _text.begin()}, _count{0},
     _gapStart{*this, _text.begin()}, _gapEnd{*this, _text.end()} {
@@ -45,16 +46,16 @@ public:
         return !operator==(that);
     }
 
-    BufferIterator<T> operator[](size_t loc) {
-        return BufferIterator<T>(*this, loc);
+    iterator operator[](size_t loc) {
+        return iterator(*this, loc);
     }
 
-    BufferIterator<T> begin() {
-        return BufferIterator<T>(*this, _text.begin());
+    iterator begin() {
+        return iterator(*this, _text.begin());
     }
 
-    BufferIterator<T> end() {
-        return BufferIterator<T>(*this, _count);
+    iterator end() {
+        return iterator(*this, _count);
     }
 
     bool insert(T c) {
@@ -67,12 +68,12 @@ public:
         return true;
     }
 
-    BufferIterator<T> point() const {
+    iterator point() const {
         return _point;
     }
 
     bool pointMove(int count) {
-        BufferIterator<T> loc(_point);
+        iterator loc(_point);
         loc += count;
 
         if (loc < begin() || loc >= end()) {
@@ -84,7 +85,7 @@ public:
         return true;
     }
 
-    bool pointSet(BufferIterator<T> loc) {
+    bool pointSet(iterator loc) {
         if (loc < begin() || loc >= end()) {
             return false;
         }
@@ -119,13 +120,13 @@ public:
     }
 
 private:
-    friend BufferIterator<T>;
+    friend iterator;
 
-    BUFFER            _text;
-    BufferIterator<T> _point;
-    size_t            _count;
-    BufferIterator<T> _gapStart;
-    BufferIterator<T> _gapEnd;
+    BUFFER   _text;
+    iterator _point;
+    size_t   _count;
+    iterator _gapStart;
+    iterator _gapEnd;
 
     void moveGap() {
         if (_point == _gapStart) {
