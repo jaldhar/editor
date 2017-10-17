@@ -16,11 +16,11 @@ static constexpr size_t BUFFERSIZE = 80;
 using BUFFER = std::array<char, BUFFERSIZE>;
 
 struct BufferInternals {
-    size_t _size;
-    size_t _point;
-    size_t _count;
-    size_t _gapStart;
-    size_t _gapEnd;
+    size_t    _size;
+    ptrdiff_t  _point;
+    size_t    _count;
+    ptrdiff_t _gapStart;
+    ptrdiff_t _gapEnd;
 };
 
 template<typename T> class BufferIterator;
@@ -46,12 +46,12 @@ public:
         return !operator==(that);
     }
 
-    iterator operator[](size_t loc) {
-        return iterator(*this, loc);
+    T& operator[](ptrdiff_t loc) {
+        return *iterator(*this, loc);
     }
 
     iterator begin() {
-        return iterator(*this, _text.begin());
+        return iterator(*this, (size_t)0);
     }
 
     iterator end() {
@@ -73,16 +73,9 @@ public:
     }
 
     bool pointMove(int count) {
-        iterator loc(_point);
-        loc += count;
+        iterator loc(_point + count);
 
-        if (loc < begin() || loc >= end()) {
-            return false;
-        }
-
-        _point = loc;
-
-        return true;
+        return pointSet(loc);
     }
 
     bool pointSet(iterator loc) {
@@ -112,10 +105,10 @@ public:
     BufferInternals internals()  {
         return {
             size(),
-            static_cast<size_t>(_point - begin()),
+            distance(begin(), _point),
             _count,
-            static_cast<size_t>(_gapStart - begin()),
-            static_cast<size_t>(_gapEnd - begin())
+            distance(begin(), _gapStart),
+            distance(begin(), _gapEnd)
         };
     }
 
@@ -193,124 +186,96 @@ public:
         return *this;
     }
 
-    bool operator==(const BufferIterator<T>& that) const {
-        return this->_b._text == that._b._text && this->_i == that._i;
-    }
-
-    bool operator!=(const BufferIterator<T>& that) const {
-        return !operator==(that);
-    }
-
-    bool operator<(const BufferIterator<T>& that) const {
-        return this->_b._text == that._b._text && this->_i < that._i;
-    }
-
-    bool operator>(const BufferIterator<T>& that) const {
-        return this->_b._text == that._b._text && that._i < this->_i;
-    }
-
-    bool operator<=(const BufferIterator<T>& that) const {
-        return !operator>(that);
-    }
-
-    bool operator>=(const BufferIterator<T>& that) const {
-        return !operator<(that);
-    }
-
-    BufferIterator<T>& operator-=(size_t count) {
-        auto& i = *this;
-        while(count) {
-            i--;
-            if (i <= _b._gapEnd) {
-                i = _b._gapStart;
-            }
-        }
-
-        return i;
-    }
-
-    friend difference_type operator-=(const BufferIterator<T>& lhs,
+    friend bool operator==(const BufferIterator<T>& lhs,
     const BufferIterator<T>& rhs) {
-        if (lhs._b != rhs._b) {
-            return 0;
-        }
-        return lhs._i - rhs._i;
+        return /* lhs._b == rhs._b && */lhs._i == rhs._i;
     }
 
-    BufferIterator<T>& operator-(size_t count) {
-        return BufferIterator<T>(*this) -= count;
-    }
-
-    friend difference_type operator-(const BufferIterator<T>& lhs,
+    friend bool operator!=(const BufferIterator<T>& lhs,
     const BufferIterator<T>& rhs) {
-        return lhs -= rhs;
+        return !lhs.operator==(rhs);
     }
 
-    BufferIterator<T>& operator--() {
-        return operator-(1);
-    }
-
-    BufferIterator<T> operator--(int) {
-        BufferIterator<T> result(*this);
-        operator--();
-        return result;
-    }
-
-    BufferIterator<T>& operator+=(size_t count) {
-        auto& i = *this;
-        while(count) {
-            i++;
-            if (i >= _b._gapStart) {
-                i = _b._gapEnd;
-            }
-        }
-
-        return i;
-    }
-
-    friend difference_type operator+=(const BufferIterator<T>& lhs,
+    friend bool operator<(const BufferIterator<T>& lhs,
     const BufferIterator<T>& rhs) {
-        if (lhs._b != rhs._b) {
-            return 0;
-        }
-        return lhs._i + rhs._i;
+        return /* lhs._b == rhs._b && */ lhs._i < rhs._i;
     }
 
-    BufferIterator<T>& operator+(size_t count) {
-        return BufferIterator<T>(*this) += count;
-    }
-
-    friend difference_type operator+(const BufferIterator<T>& lhs,
+    friend bool operator>(const BufferIterator<T>& lhs,
     const BufferIterator<T>& rhs) {
-        return lhs += rhs;
+        return /* lhs._b == rhs._b && */ lhs._i < rhs._i;
+    }
+
+    friend bool operator<=(const BufferIterator<T>& lhs,
+    const BufferIterator<T>& rhs) {
+        return operator>(lhs, rhs);
+    }
+
+    friend bool operator>=(const BufferIterator<T>& lhs,
+    const BufferIterator<T>& rhs) {
+        return operator<(lhs, rhs);
+    }
+
+    BufferIterator<T>& operator+=(const difference_type that) {
+        this->_i += that;
+        return *this;
+    }
+
+    BufferIterator<T> operator+(const difference_type that) {
+        return BufferIterator<T>(this->_b, this->_i + that);
+    }
+
+    difference_type operator+(const BufferIterator<T>& that) const {
+        return this->_i + that._i;
+    }
+
+    BufferIterator<T>& operator-=(const difference_type that) {
+        this->_i -= that;
+        return *this;
+    }
+
+    BufferIterator<T> operator-(const difference_type that) {
+        return BufferIterator<T>(this->_b, this->_i - that);
+    }
+
+    difference_type operator-(const BufferIterator<T>& that) const {
+        return this->_i - that._i;
     }
 
     BufferIterator<T>& operator++() {
-        return operator+(1);
+        operator+(1);
+        return *this;
     }
 
     BufferIterator<T> operator++(int) {
-        BufferIterator<T> result(*this);
+        BufferIterator<T> tmp(*this);
         operator++();
-        return result;
+        return tmp;
     }
 
-    reference operator[](size_t i) {
-        return _b[i];
+    BufferIterator<T>& operator--() {
+        operator-(1);
+        return *this;
     }
 
-    const reference operator[](size_t i) const {
-        return _b[i];
+    BufferIterator<T> operator--(int) {
+        BufferIterator<T> tmp(*this);
+        operator--();
+        return tmp;
     }
 
     reference operator*() {
         return *_i;
     }
 
-    size_t pos() {
-        size_t count = _i - _b._text.begin();
+    pointer operator->() {
+        return _i;
+    }
+
+    difference_type pos() {
+        difference_type count = _i - _b._text.begin();
         if (*this > _b._gapEnd) {
-            count -= (_b._gapEnd - _b._gapStart);
+            count -= distance(_b._gapStart, _b._gapEnd);
         }
 
         return count;
