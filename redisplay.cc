@@ -26,7 +26,7 @@ void Redisplay::operator()() {
     }
 
     wmove(stdscr, 4 , 0);
-    for (ptrdiff_t c = 0, l = _subeditor->_buffer.size(); c < l; c++) {
+    for (ptrdiff_t c = 0, l = _subeditor->_buffer.capacity(); c < l; c++) {
         if (c == internals._point) {
             mvwaddch(stdscr, 5, c, 'P' | A_BOLD);
         }
@@ -41,8 +41,10 @@ void Redisplay::operator()() {
         }
     }
 
-    mvwprintw(stdscr, 7, 0, "Gap start = %d Gap end = %d Point = %d Count = %d",
-        internals._gapStart, internals._gapEnd, internals._point, internals._count);
+    mvwprintw(stdscr, 7, 0,
+        "Buffer capacity = %d Gap start = %d Gap end = %d Point = %d Size = %d",
+        internals._capacity, internals._gapStart, internals._gapEnd,
+        internals._point, internals._size);
 
     wmove(stdscr, 1, internals._point);
 }

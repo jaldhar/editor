@@ -16,9 +16,9 @@ static constexpr size_t BUFFERSIZE = 80;
 using BUFFER = std::array<char, BUFFERSIZE>;
 
 struct BufferInternals {
+    size_t    _capacity;
+    ptrdiff_t _point;
     size_t    _size;
-    ptrdiff_t  _point;
-    size_t    _count;
     ptrdiff_t _gapStart;
     ptrdiff_t _gapEnd;
 };
@@ -52,6 +52,10 @@ public:
 
     iterator begin() {
         return iterator(*this, (size_t)0);
+    }
+
+    size_t capacity() {
+        return _text.size();
     }
 
     iterator end() {
@@ -104,9 +108,9 @@ public:
 
     BufferInternals internals()  {
         return {
-            size(),
+            capacity(),
             distance(begin(), _point),
-            _count,
+            size(),
             distance(begin(), _gapStart),
             distance(begin(), _gapEnd)
         };
