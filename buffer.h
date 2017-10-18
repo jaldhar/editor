@@ -163,6 +163,9 @@ public:
     using reference = T&;
     using iterator_category = std::random_access_iterator_tag;
 
+    BufferIterator() : _b{nullptr}, _i{nullptr} {
+    }
+
     BufferIterator(Buffer<T>& b) : _b{b}, _i{_b._text.begin()} {
     }
 
@@ -171,11 +174,7 @@ public:
 
     BufferIterator(Buffer<T>& b, size_t count) : _b{b},
     _i{_b._text.begin()} {
-        _i += count;
-
-        if (*this > _b._gapStart) {
-            *this -= (_b._gapEnd - _b._gapStart);
-        }
+        this->operator+=(count);
     }
 
     BufferIterator(const BufferIterator<T>& that) : _b(that._b),
@@ -190,64 +189,66 @@ public:
         return *this;
     }
 
-    friend bool operator==(const BufferIterator<T>& lhs,
-    const BufferIterator<T>& rhs) {
-        return /* lhs._b == rhs._b && */lhs._i == rhs._i;
+    bool operator==(const BufferIterator<T>& that) {
+        return _i == that._i;
     }
 
-    friend bool operator!=(const BufferIterator<T>& lhs,
-    const BufferIterator<T>& rhs) {
-        return !lhs.operator==(rhs);
+    bool operator!=(const BufferIterator<T>& that) {
+        return !this->operator==(that);
     }
 
     friend bool operator<(const BufferIterator<T>& lhs,
     const BufferIterator<T>& rhs) {
-        return /* lhs._b == rhs._b && */ lhs._i < rhs._i;
+        return lhs._i < rhs._i;
     }
 
     friend bool operator>(const BufferIterator<T>& lhs,
     const BufferIterator<T>& rhs) {
-        return /* lhs._b == rhs._b && */ lhs._i < rhs._i;
+        return lhs._i > rhs._i;
     }
 
     friend bool operator<=(const BufferIterator<T>& lhs,
     const BufferIterator<T>& rhs) {
-        return operator>(lhs, rhs);
+        return !operator>(lhs, rhs);
     }
 
     friend bool operator>=(const BufferIterator<T>& lhs,
     const BufferIterator<T>& rhs) {
-        return operator<(lhs, rhs);
+        return !operator<(lhs, rhs);
     }
 
-    BufferIterator<T>& operator+=(const difference_type that) {
-        this->_i += that;
+    BufferIterator<T>& operator+=(const difference_type& that) {
+        _i += that;
+        userToGap();
         return *this;
     }
 
-    BufferIterator<T> operator+(const difference_type that) {
+    BufferIterator<T> operator+(const difference_type& that) {
         return BufferIterator<T>(this->_b, this->_i + that);
     }
 
-    difference_type operator+(const BufferIterator<T>& that) const {
-        return this->_i + that._i;
+    friend difference_type operator+(const BufferIterator<T>& lhs,
+    const BufferIterator<T>& rhs) {
+        return lhs._i + rhs._i;
     }
 
-    BufferIterator<T>& operator-=(const difference_type that) {
-        this->_i -= that;
+    BufferIterator<T>& operator-=(const difference_type& that) {
+        _i -= that;
+        userToGap();
         return *this;
     }
 
-    BufferIterator<T> operator-(const difference_type that) {
+    BufferIterator<T> operator-(const difference_type& that) {
         return BufferIterator<T>(this->_b, this->_i - that);
     }
 
-    difference_type operator-(const BufferIterator<T>& that) const {
-        return this->_i - that._i;
+    friend difference_type operator-(const BufferIterator<T>& lhs,
+    const BufferIterator<T>& rhs) {
+            return lhs._i - rhs._i;
     }
 
     BufferIterator<T>& operator++() {
-        operator+(1);
+        this->operator+(1);
         return *this;
     }
 
@@ -258,22 +259,26 @@ public:
     }
 
     BufferIterator<T>& operator--() {
-        operator-(1);
+        this->operator-(1);
         return *this;
     }
 
-    BufferIterator<T> operator--(int) {
+    BufferIterator<T> operator--(int) const {
         BufferIterator<T> tmp(*this);
         operator--();
         return tmp;
     }
 
-    reference operator*() {
+    reference operator*() const {
         return *_i;
     }
 
-    pointer operator->() {
+    pointer operator->() const {
         return _i;
+    }
+
+    reference operator[](const difference_type& n) const {
+        return _b[n];
     }
 
     difference_type pos() {
@@ -294,7 +299,13 @@ public:
 
 private:
     Buffer<T>& _b;
-    T*         _i;
+    pointer    _i;
+
+    void userToGap() {
+        if (*this > _b._gapStart) {
+            _i += (_b._gapEnd - _b._gapStart);
+        }
+    }
 };
 
 template<typename T>
