@@ -30,8 +30,8 @@ class Buffer {
 public:
     using iterator = BufferIterator<T>;
 
-    Buffer() : _text{0}, _point{*this, _text.begin()}, _count{0},
-    _gapStart{*this, _text.begin()}, _gapEnd{*this, _text.end()} {
+    Buffer() : _text{0}, _point{_text.begin()}, _count{0},
+    _gapStart{_text.begin()}, _gapEnd{_text.end()} {
     };
 
     bool operator==(const Buffer& that) const {
@@ -72,18 +72,18 @@ public:
         return true;
     }
 
-    iterator point() const {
+    T* point() const {
         return _point;
     }
 
     bool pointMove(int count) {
-        iterator loc(_point + count);
+        T* loc = _point + count;
 
         return pointSet(loc);
     }
 
-    bool pointSet(iterator loc) {
-        if (loc < begin() || loc >= end()) {
+    bool pointSet(T* loc) {
+        if (loc < _text.begin() || loc >= _text.end()) {
             return false;
         }
 
@@ -109,10 +109,10 @@ public:
     BufferInternals internals()  {
         return {
             capacity(),
-            distance(begin(), _point),
+            distance(_text.begin(), _point),
             size(),
-            distance(begin(), _gapStart),
-            distance(begin(), _gapEnd)
+            distance(_text.begin(), _gapStart),
+            distance(_text.begin(), _gapEnd)
         };
     }
 
@@ -120,21 +120,20 @@ private:
     friend iterator;
 
     BUFFER   _text;
-    iterator _point;
+    T*       _point;
     size_t   _count;
-    iterator _gapStart;
-    iterator _gapEnd;
+    T*       _gapStart;
+    T*       _gapEnd;
 
     void moveGap() {
         if (_point == _gapStart) {
             return;
         }
 
-        _gapStart = _point;
         size_t n;
 
         if (_gapStart < _point) { // point is after gapStart
-            n = _point - _gapEnd;
+            n = _point - _gapStart;
             _gapEnd += n;
 
         } else { // point is before _gapStart
@@ -142,6 +141,7 @@ private:
             _gapEnd -= n;
         }
 
+        _gapStart = _point;
         copy(_point, _point + n, _gapEnd);
     }
 };
@@ -283,7 +283,7 @@ public:
 
     difference_type pos() {
         difference_type count = _i - _b._text.begin();
-        if (*this > _b._gapEnd) {
+        if (_i > _b._gapEnd) {
             count -= distance(_b._gapStart, _b._gapEnd);
         }
 
@@ -302,8 +302,8 @@ private:
     pointer    _i;
 
     void userToGap() {
-        if (*this > _b._gapStart) {
-            _i += (_b._gapEnd - _b._gapStart);
+        if (_i > _b._gapStart) {
+            _i += distance(_b._gapStart, _b._gapEnd);
         }
     }
 };
