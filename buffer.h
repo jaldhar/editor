@@ -30,7 +30,7 @@ class Buffer {
 public:
     using iterator = BufferIterator<T>;
 
-    Buffer() : _text{0}, _point{_text.begin()}, _count{0},
+    Buffer() : _text{0}, _point{0}, _count{0},
     _gapStart{_text.begin()}, _gapEnd{_text.end()} {
     };
 
@@ -47,7 +47,7 @@ public:
     }
 
     T& operator[](ptrdiff_t loc) {
-        return *iterator(*this, loc);
+        return *iterator(*this, userToGap(loc));
     }
 
     iterator begin() {
@@ -77,7 +77,7 @@ public:
     }
 
     bool pointMove(int count) {
-        T* loc = _point + count;
+        T* loc = userToGap(_point + count);
 
         return pointSet(loc);
     }
@@ -87,7 +87,7 @@ public:
             return false;
         }
 
-        _point = loc;
+        _point = gapToUser(loc);
 
         return true;
     }
@@ -109,7 +109,7 @@ public:
     BufferInternals internals()  {
         return {
             capacity(),
-            distance(_text.begin(), _point),
+            distance(_text.begin(), userToGap(_point)),
             size(),
             distance(_text.begin(), _gapStart),
             distance(_text.begin(), _gapEnd)
@@ -119,31 +119,54 @@ public:
 private:
     friend iterator;
 
-    BUFFER   _text;
-    T*       _point;
-    size_t   _count;
-    T*       _gapStart;
-    T*       _gapEnd;
+    BUFFER    _text;
+    ptrdiff_t _point;
+    size_t    _count;
+    T*        _gapStart;
+    T*        _gapEnd;
 
     void moveGap() {
-        if (_point == _gapStart) {
+        T* p = userToGap(_point);
+        if (p == _gapStart) {
             return;
         }
 
         size_t n;
-
-        if (_gapStart < _point) { // point is after gapStart
-            n = _point - _gapStart;
+        if (_gapStart < p) { // point is after gapStart
+            n = p - _gapEnd;
+            _gapStart += n;
             _gapEnd += n;
-
+            copy(p - n , p, _gapStart);
+            _point = gapToUser(_gapStart);
         } else { // point is before _gapStart
-            n = _gapStart - _point;
+            n = _gapStart - p;
+            _gapStart -= n;
             _gapEnd -= n;
+            copy(p, p + n, _gapEnd);
+        }
+    }
+
+    T* userToGap(ptrdiff_t p) {
+        T* t;
+
+        t = _text.begin() + p;
+        if (t > _gapStart) {
+            t += distance(_gapStart, _gapEnd);
         }
 
-        _gapStart = _point;
-        copy(_point, _point + n, _gapEnd);
+        return t;
     }
+
+    ptrdiff_t gapToUser(T* i) {
+        ptrdiff_t count = i -_text.begin();
+        if (i > _gapEnd) {
+            count -= distance(_gapStart, _gapEnd);
+        }
+
+        return count;
+    }
+
+
 };
 
 
@@ -219,7 +242,6 @@ public:
 
     BufferIterator<T>& operator+=(const difference_type& that) {
         _i += that;
-        userToGap();
         return *this;
     }
 
@@ -234,7 +256,6 @@ public:
 
     BufferIterator<T>& operator-=(const difference_type& that) {
         _i -= that;
-        userToGap();
         return *this;
     }
 
@@ -278,16 +299,10 @@ public:
     }
 
     reference operator[](const difference_type& n) const {
-        return _b[n];
-    }
-
-    difference_type pos() {
-        difference_type count = _i - _b._text.begin();
-        if (_i > _b._gapEnd) {
-            count -= distance(_b._gapStart, _b._gapEnd);
+        if (n < 0 || n >= this->_b._count) {
+            return nullptr;
         }
-
-        return count;
+        return *BufferIterator<T>(this->_b, this->_b.userToGap(n));
     }
 
     void swap(BufferIterator<T>& that) {
@@ -301,11 +316,6 @@ private:
     Buffer<T>& _b;
     pointer    _i;
 
-    void userToGap() {
-        if (_i > _b._gapStart) {
-            _i += distance(_b._gapStart, _b._gapEnd);
-        }
-    }
 };
 
 template<typename T>

@@ -15,11 +15,11 @@ Subeditor::Subeditor() : _buffer() {
 }
 
 size_t Subeditor::bufferStart() {
-    return _buffer.begin().pos();
+    return 0;
 }
 
 size_t Subeditor::bufferEnd() {
-    return _buffer.end().pos();
+    return _buffer.size();
 }
 
 bool Subeditor::insertACharacter(bool& /*isArg*/, int& arg,

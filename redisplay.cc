@@ -25,7 +25,9 @@ void Redisplay::operator()() {
         waddch(stdscr, _subeditor->_buffer[c]);
     }
 
-    wmove(stdscr, 4 , 0);
+    wmove(stdscr, 5, 0);
+    wclrtoeol(stdscr);
+    wmove(stdscr, 4, 0);
     for (ptrdiff_t c = 0, l = _subeditor->_buffer.capacity(); c < l; c++) {
         if (c == internals._point) {
             mvwaddch(stdscr, 5, c, 'P' | A_BOLD);
