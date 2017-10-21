@@ -20,9 +20,9 @@ void Redisplay::operator()() {
     BufferInternals internals = _subeditor->_buffer.internals();
 
     wmove(stdscr, 1 , 0);
-    for (auto c = _subeditor->bufferStart(); c != _subeditor->bufferEnd();
+    for (auto c = _subeditor->_buffer.begin(); c != _subeditor->_buffer.end();
     c++) {
-        waddch(stdscr, _subeditor->_buffer[c]);
+        waddch(stdscr, *c);
     }
 
     wmove(stdscr, 5, 0);
@@ -35,8 +35,8 @@ void Redisplay::operator()() {
         if (c >= internals._gapStart && c < internals._gapEnd) {
             mvwaddch(stdscr, 4, c, '#' | A_BOLD);
         } else {
-            if (isprint(_subeditor->_buffer[c])) {
-                mvwaddch(stdscr, 4, c, _subeditor->_buffer[c]);
+            if (isprint(_subeditor->_buffer._text[c])) {
+                mvwaddch(stdscr, 4, c, _subeditor->_buffer._text[c]);
             } else {
                 mvwaddch(stdscr, 4, c, '~');
             }
