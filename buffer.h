@@ -135,26 +135,22 @@ private:
     }
 
     T* userToGap(ptrdiff_t p) {
-        T* t;
+        T* i = _text.begin() + p;
 
-        t = _text.begin() + p;
-        if (t > _gapStart) {
-            t += distance(_gapStart, _gapEnd);
+        if (i > _gapStart) {
+            i += (_gapEnd - _gapStart);
         }
 
-        return t;
+        return i;
     }
 
     ptrdiff_t gapToUser(T* i) {
-        ptrdiff_t count = i -_text.begin();
+        ptrdiff_t p = i - _text.begin();
         if (i > _gapEnd) {
-            count -= distance(_gapStart, _gapEnd);
+            p -= (_gapEnd - _gapStart);
         }
-
-        return count;
+        return p;
     }
-
-
 };
 
 template<typename T>
@@ -191,7 +187,7 @@ public:
     }
 
     BufferIterator<T>& operator+=(const difference_type& that) {
-        _i += that;
+        _i = _b.userToGap(_b.gapToUser(_i + that));
         return *this;
     }
 
