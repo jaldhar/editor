@@ -31,14 +31,13 @@ class Buffer {
 public:
     using iterator = BufferIterator<T>;
 
-    Buffer() : _text{0}, _point{0}, _count{0},
+    Buffer() : _text{0}, _point{0},
     _gapStart{_text.begin()}, _gapEnd{_text.end()} {
     };
 
     bool operator==(const Buffer& that) const {
         return this->_text == that._text &&
             this->_point == that._point &&
-            this->_count == that._count &&
             this->_gapStart == that._gapStart &&
             this->_gapEnd == that._gapEnd;
     };
@@ -56,7 +55,7 @@ public:
     }
 
     iterator end() {
-        return iterator(*this) + _count;
+        return iterator(*this) + size();
     }
 
     bool insert(T c) {
@@ -64,7 +63,6 @@ public:
         *_gapStart = c;
         _gapStart++;
         pointMove(1);
-        _count++;
 
         return true;
     }
@@ -90,7 +88,7 @@ public:
     }
 
     size_t size() {
-        return _count;
+        return _text.size() - (_gapEnd - _gapStart);
     }
 
     BufferInternals internals()  {
@@ -109,7 +107,6 @@ private:
 
     BUFFER    _text;
     ptrdiff_t _point;
-    size_t    _count;
     T*        _gapStart;
     T*        _gapEnd;
 
