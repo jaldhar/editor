@@ -59,12 +59,15 @@ public:
     }
 
     bool insert(T c) {
+        T* loc = userToGap(_point);
+        if (loc < _text.begin() || loc > _text.end()) {
+            return false;
+        }
+
         moveGap();
         *_gapStart = c;
         _gapStart++;
-        pointMove(1);
-
-        return true;
+        return pointMove(1);
     }
 
     T* point() const {
@@ -73,12 +76,15 @@ public:
 
     bool pointMove(int count) {
         T* loc = userToGap(_point + count);
+        if (loc < _text.begin() || loc > _text.end()) {
+            return false;
+        }
 
         return pointSet(loc);
     }
 
     bool pointSet(T* loc) {
-        if (loc < _text.begin() || loc >= _text.end()) {
+        if (loc < _text.begin() || loc > _text.end()) {
             return false;
         }
 
