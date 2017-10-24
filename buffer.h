@@ -70,7 +70,7 @@ public:
         return pointMove(1);
     }
 
-    T* point() const {
+    ptrdiff_t point() const {
         return _point;
     }
 

@@ -16,6 +16,7 @@ public:
     Subeditor();
     size_t bufferStart();
     size_t bufferEnd();
+    size_t point();
 
     bool insertACharacter(bool& isArg, int& arg, bool& isExit, char c);
     bool moveBackwardACharacter(bool& isArg, int& arg, bool& isExit, char c);

@@ -22,6 +22,10 @@ size_t Subeditor::bufferEnd() {
     return _buffer.size();
 }
 
+size_t Subeditor::point() {
+    return static_cast<size_t>(_buffer.point());
+}
+
 bool Subeditor::insertACharacter(bool& /*isArg*/, int& arg,
 bool& /*isExit*/, char c) {
     if (arg < 0) {

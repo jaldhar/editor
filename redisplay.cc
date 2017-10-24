@@ -48,5 +48,5 @@ void Redisplay::operator()() {
         internals._capacity, internals._gapStart, internals._gapEnd,
         internals._point, internals._size);
 
-    wmove(stdscr, 1, internals._point);
+    wmove(stdscr, 1, _subeditor->point());
 }
