@@ -142,7 +142,7 @@ private:
     }
 
     ptrdiff_t gapToUser(T* i) {
-        ptrdiff_t p = i - _text.begin();
+        ptrdiff_t p = distance(_text.begin(), i);
         if (i > _gapEnd) {
             p -= (_gapEnd - _gapStart);
         }
@@ -184,7 +184,13 @@ public:
     }
 
     BufferIterator<T>& operator+=(const difference_type& that) {
-        _i = _b.userToGap(_b.gapToUser(_i + that));
+        auto count = that;
+        while (count--) {
+            _i++;
+            if (_i == _b._gapStart) {
+                _i += (_b._gapEnd - _b._gapStart);
+            }
+        }
         return *this;
     }
 
