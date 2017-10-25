@@ -31,7 +31,6 @@ bool Evaluate::operator()(char c) {
             if (!_subeditor->insertACharacter(isArg, arg, isExit, c)) {
                 // _key.beep();
             }
-            return false;
         }
     } else {
         while (!(it->second)(_subeditor, isArg, arg, isExit, c)) {

@@ -33,7 +33,9 @@ bool& /*isExit*/, char c) {
     }
 
     while (arg-- > 0) {
-        _buffer.insert(c);
+        if (!_buffer.insert(c)) {
+            return false;
+        }
     }
 
     return true;
@@ -42,13 +44,15 @@ bool& /*isExit*/, char c) {
 bool Subeditor::moveBackwardACharacter(bool& /*isArg*/, int& arg,
 bool& /*isExit*/, char /*c*/) {
     arg = -1;
-    return _buffer.pointMove(arg);
+    _buffer.pointMove(arg);
+    return true;
 }
 
 bool Subeditor::moveForwardACharacter(bool& /*isArg*/, int& arg,
 bool& /*isExit*/, char /*c*/) {
     arg = 1;
-    return _buffer.pointMove(arg);
+    _buffer.pointMove(arg);
+    return true;
 }
 
 bool Subeditor::quit(bool& /*isArg*/, int& /*arg*/, bool& isExit, char /*c*/) {
