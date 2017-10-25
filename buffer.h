@@ -46,6 +46,10 @@ public:
         return !operator==(that);
     }
 
+    T& operator[](ptrdiff_t loc) {
+        return iterator(*this)[loc];
+    }
+
     iterator begin() {
         return iterator(*this);
     }
@@ -164,7 +168,7 @@ public:
     using difference_type = std::ptrdiff_t;
     using pointer = T*;
     using reference = T&;
-    using iterator_category = std::bidirectional_iterator_tag;
+    using iterator_category = std::random_access_iterator_tag;
 
     BufferIterator() : _b{nullptr}, _i{nullptr} {
     }
@@ -190,6 +194,26 @@ public:
 
     bool operator!=(const BufferIterator<T>& that) {
         return !this->operator==(that);
+    }
+
+    friend bool operator<(const BufferIterator<T>& lhs,
+    const BufferIterator<T>& rhs) {
+        return lhs._i < rhs._i;
+    }
+
+    friend bool operator>(const BufferIterator<T>& lhs,
+    const BufferIterator<T>& rhs) {
+        return lhs._i > rhs._i;
+    }
+
+    friend bool operator<=(const BufferIterator<T>& lhs,
+    const BufferIterator<T>& rhs) {
+        return !operator>(lhs, rhs);
+    }
+
+    friend bool operator>=(const BufferIterator<T>& lhs,
+    const BufferIterator<T>& rhs) {
+        return !operator<(lhs, rhs);
     }
 
     BufferIterator<T>& operator+=(const difference_type& that) {
@@ -260,6 +284,10 @@ public:
 
     pointer operator->() const {
         return _i;
+    }
+
+    reference operator[](const difference_type& n) const {
+        return *(this->_b.begin() + n);
     }
 
 private:
