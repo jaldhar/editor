@@ -43,7 +43,9 @@ void Redisplay::operator()() {
         }
     }
 
-    mvwprintw(stdscr, 7, 0,
+    wmove(stdscr, 7, 0);
+    wclrtoeol(stdscr);
+    wprintw(stdscr,
         "Buffer capacity = %d Gap start = %d Gap end = %d Point = %d Size = %d",
         internals._capacity, internals._gapStart, internals._gapEnd,
         internals._point, internals._size);
