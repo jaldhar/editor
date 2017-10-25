@@ -164,7 +164,10 @@ public:
     using difference_type = std::ptrdiff_t;
     using pointer = T*;
     using reference = T&;
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::bidirectional_iterator_tag;
+
+    BufferIterator() : _b{nullptr}, _i{nullptr} {
+    }
 
     BufferIterator(Buffer<T>& b) : _b{b}, _i{_b._text.begin()} {
     }
@@ -217,6 +220,37 @@ public:
     BufferIterator<T> operator++(int) {
         BufferIterator<T> tmp(*this);
         operator++();
+        return tmp;
+    }
+
+    BufferIterator<T>& operator-=(const difference_type& that) {
+        auto count = that;
+        while (count--) {
+            _i--;
+            if (_i == _b._gapEnd) {
+                _i -= (_b._gapEnd - _b._gapStart);
+            }
+        }
+        return *this;
+    }
+
+    BufferIterator<T> operator-(const difference_type& that) {
+        return BufferIterator<T>(*this -= that);
+    }
+
+    friend difference_type operator-(const BufferIterator<T>& lhs,
+    const BufferIterator<T>& rhs) {
+        return lhs._i - rhs._i;
+    }
+
+    BufferIterator<T>& operator--() {
+        this->operator-(1);
+        return *this;
+    }
+
+    BufferIterator<T> operator--(int) {
+        BufferIterator<T> tmp(*this);
+        operator--();
         return tmp;
     }
 
