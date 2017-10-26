@@ -216,19 +216,30 @@ public:
         return !operator<(lhs, rhs);
     }
 
-    BufferIterator<T>& operator+=(const difference_type& that) {
-        auto count = that;
-        while (count--) {
-            _i++;
-            if (_i == _b._gapStart) {
-                _i += (_b._gapEnd - _b._gapStart);
+    BufferIterator<T>& operator+=(const difference_type& n) {
+        auto count = n;
+
+        if (count >= 0) {
+            while (count--) {
+                ++_i;
+                if (_i == _b._gapStart) {
+                    _i += (_b._gapEnd - _b._gapStart);
+                }
+            }
+        } else {
+            while (count++) {
+                --_i;
+                if (_i == _b._gapEnd) {
+                    _i -= (_b._gapEnd - _b._gapStart);
+                }
             }
         }
+
         return *this;
     }
 
-    BufferIterator<T> operator+(const difference_type& that) {
-        return BufferIterator<T>(*this += that);
+    BufferIterator<T> operator+(const difference_type& n) {
+        return BufferIterator<T>(*this += n);
     }
 
     friend difference_type operator+(const BufferIterator<T>& lhs,
@@ -247,19 +258,12 @@ public:
         return tmp;
     }
 
-    BufferIterator<T>& operator-=(const difference_type& that) {
-        auto count = that;
-        while (count--) {
-            _i--;
-            if (_i == _b._gapEnd) {
-                _i -= (_b._gapEnd - _b._gapStart);
-            }
-        }
-        return *this;
+    BufferIterator<T>& operator-=(const difference_type& n) {
+        return *this += -n;
     }
 
-    BufferIterator<T> operator-(const difference_type& that) {
-        return BufferIterator<T>(*this -= that);
+    BufferIterator<T> operator-(const difference_type& n) {
+        return BufferIterator<T>(*this - n);
     }
 
     friend difference_type operator-(const BufferIterator<T>& lhs,
@@ -272,7 +276,7 @@ public:
         return *this;
     }
 
-    BufferIterator<T> operator--(int) {
+    const BufferIterator<T>& operator--(int) {
         BufferIterator<T> tmp(*this);
         operator--();
         return tmp;
@@ -287,7 +291,7 @@ public:
     }
 
     reference operator[](const difference_type& n) const {
-        return *(this->_b.begin() + n);
+        return *(_i + n);
     }
 
 private:
