@@ -73,6 +73,17 @@ public:
         return pointMove(-1);
     }
 
+    bool deleteNext() {
+        T* loc = userToGap(_point);
+        if (loc <= _text.begin() || loc >= _text.end()) {
+            return false;
+        }
+
+        moveGap();
+        _gapEnd++;
+        return true;
+    }
+
     bool insert(T c) {
         T* loc = userToGap(_point);
         if (loc < _text.begin() || loc > _text.end()) {

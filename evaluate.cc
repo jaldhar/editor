@@ -18,6 +18,8 @@ Evaluate::Evaluate(Subeditor* subeditor) : _keymap {
     { KEY_LEFT, &Subeditor::moveBackwardACharacter },
     { 0x08, &Subeditor::deletePreviousCharacter }, // CTRL-h
     { KEY_BACKSPACE, &Subeditor::deletePreviousCharacter },
+    { 0x04, &Subeditor::deleteNextCharacter },
+    { KEY_DC, &Subeditor::deleteNextCharacter },
     { 0x11, &Subeditor::quit }, // CTRL-q
 }, _subeditor{subeditor} {
 }
