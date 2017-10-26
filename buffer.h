@@ -1,4 +1,4 @@
-// Buffer -- manages text in a text editor (Interface)
+// Buffer -- manages text in a text editor (Interface and Implementation)
 //
 // By Jaldhar H. Vyas <jaldhar@braincells.com>
 // Copyright (C) 2017, Consolidated Braincells Inc. All rights reserved.
@@ -8,12 +8,12 @@
 #define _BUFFER_H_
 
 #include <algorithm>
-#include <array>
 #include <cstdlib>
 #include <iterator>
+#include <vector>
 
 static constexpr size_t BUFFERSIZE = 80;
-using BUFFER = std::array<char, BUFFERSIZE>;
+using BUFFER = std::vector<char>;
 
 struct BufferInternals {
     size_t    _capacity;
@@ -29,9 +29,15 @@ class Redisplay;
 template<typename T>
 class Buffer {
 public:
+    using value_type = T;
+    using reference = T&;
+    using const_reference = const T&;
     using iterator = BufferIterator<T>;
+    using const_iterator = const iterator;
+    using difference_type = ptrdiff_t;
+    using size_type = size_t;
 
-    Buffer() : _text{0}, _point{0},
+    Buffer() : _text(BUFFERSIZE, 0), _point{0},
     _gapStart{_text.begin()}, _gapEnd{_text.end()} {
     };
 
@@ -46,7 +52,7 @@ public:
         return !operator==(that);
     }
 
-    T& operator[](ptrdiff_t loc) {
+    reference operator[](difference_type loc) {
         return iterator(*this)[loc];
     }
 
@@ -54,7 +60,7 @@ public:
         return iterator(*this);
     }
 
-    size_t capacity() {
+    size_type capacity() {
         return _text.size();
     }
 
@@ -63,7 +69,7 @@ public:
     }
 
     bool deletePrevious() {
-        T* loc = userToGap(_point);
+        BUFFER::iterator loc = userToGap(_point);
         if (loc <= _text.begin() || loc > _text.end()) {
             return false;
         }
@@ -74,7 +80,7 @@ public:
     }
 
     bool deleteNext() {
-        T* loc = userToGap(_point);
+        BUFFER::iterator loc = userToGap(_point);
         if (loc <= _text.begin() || loc >= _text.end()) {
             return false;
         }
@@ -84,8 +90,8 @@ public:
         return true;
     }
 
-    bool insert(T c) {
-        T* loc = userToGap(_point);
+    bool insert(value_type c) {
+        BUFFER::iterator loc = userToGap(_point);
         if (loc < _text.begin() || loc > _text.end()) {
             return false;
         }
@@ -101,7 +107,7 @@ public:
     }
 
     bool pointMove(int count) {
-        T* loc = userToGap(_point + count);
+        BUFFER::iterator loc = userToGap(_point + count);
         if (loc < _text.begin() || loc > _text.end()) {
             return false;
         }
@@ -109,7 +115,7 @@ public:
         return pointSet(loc);
     }
 
-    bool pointSet(T* loc) {
+    bool pointSet(BUFFER::iterator loc) {
         if (loc < _text.begin() || loc > _text.end()) {
             return false;
         }
@@ -119,7 +125,7 @@ public:
         return true;
     }
 
-    size_t size() {
+    size_type size() {
         return _text.size() - (_gapEnd - _gapStart);
     }
 
@@ -137,13 +143,13 @@ private:
     friend iterator;
     friend Redisplay;
 
-    BUFFER    _text;
-    ptrdiff_t _point;
-    T*        _gapStart;
-    T*        _gapEnd;
+    BUFFER           _text;
+    difference_type  _point;
+    BUFFER::iterator _gapStart;
+    BUFFER::iterator _gapEnd;
 
     void moveGap() {
-        T* p = userToGap(_point);
+        BUFFER::iterator p = userToGap(_point);
         if (p == _gapStart) {
             return;
         }
@@ -163,8 +169,8 @@ private:
         }
     }
 
-    T* userToGap(ptrdiff_t p) {
-        T* i = _text.begin() + p;
+    BUFFER::iterator userToGap(difference_type p) {
+        BUFFER::iterator i = _text.begin() + p;
 
         if (i > _gapStart) {
             i += (_gapEnd - _gapStart);
@@ -173,8 +179,8 @@ private:
         return i;
     }
 
-    ptrdiff_t gapToUser(T* i) {
-        ptrdiff_t p = distance(_text.begin(), i);
+    difference_type gapToUser(BUFFER::iterator i) {
+        difference_type p = distance(_text.begin(), i);
         if (i > _gapEnd) {
             p -= (_gapEnd - _gapStart);
         }
@@ -187,9 +193,9 @@ class BufferIterator {
 public:
     // Iterator traits, previously from std::iterator.
     using value_type = T;
-    using difference_type = std::ptrdiff_t;
-    using pointer = T*;
-    using reference = T&;
+    using difference_type = typename BUFFER::difference_type;
+    using pointer = typename BUFFER::iterator;
+    using reference = typename Buffer<T>::reference;
     using iterator_category = std::random_access_iterator_tag;
 
     BufferIterator() : _b{nullptr}, _i{nullptr} {
