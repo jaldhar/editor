@@ -20,9 +20,9 @@ void Redisplay::operator()() {
     BufferInternals internals = _subeditor->_buffer.internals();
 
     wmove(stdscr, 1 , 0);
-    for (auto c = _subeditor->_buffer.begin(); c != _subeditor->_buffer.end();
-    c++) {
-        waddch(stdscr, *c);
+    wclrtoeol(stdscr);
+    for (auto c: _subeditor->_buffer) {
+        waddch(stdscr, c);
     }
 
     wmove(stdscr, 5, 0);
