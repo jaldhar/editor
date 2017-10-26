@@ -55,6 +55,16 @@ bool& /*isExit*/, char /*c*/) {
     return true;
 }
 
+bool Subeditor::deletePreviousCharacter(bool& /*isArg*/, int& arg,
+    bool& /*isExit*/, char /*c*/) {
+    while (arg-- > 0) {
+        if (_buffer.deletePrevious()) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool Subeditor::quit(bool& /*isArg*/, int& /*arg*/, bool& isExit, char /*c*/) {
     isExit = true;
 

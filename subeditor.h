@@ -21,6 +21,7 @@ public:
     bool insertACharacter(bool& isArg, int& arg, bool& isExit, char c);
     bool moveBackwardACharacter(bool& isArg, int& arg, bool& isExit, char c);
     bool moveForwardACharacter(bool& isArg, int& arg, bool& isExit, char c);
+    bool deletePreviousCharacter(bool& isArg, int& arg, bool& isExit, char c);
     bool quit(bool& isArg, int& arg, bool& isExit, char c);
 
 private:

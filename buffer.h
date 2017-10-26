@@ -62,6 +62,17 @@ public:
         return iterator(*this) + size();
     }
 
+    bool deletePrevious() {
+        T* loc = userToGap(_point);
+        if (loc <= _text.begin() || loc > _text.end()) {
+            return false;
+        }
+
+        moveGap();
+        _gapStart--;
+        return pointMove(-1);
+    }
+
     bool insert(T c) {
         T* loc = userToGap(_point);
         if (loc < _text.begin() || loc > _text.end()) {
