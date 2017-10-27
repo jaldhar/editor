@@ -81,7 +81,7 @@ public:
 
     bool deleteNext() {
         BUFFER::iterator loc = userToGap(_point);
-        if (loc <= _text.begin() || loc >= _text.end()) {
+        if (loc < _text.begin() || loc >= _text.end()) {
             return false;
         }
 
