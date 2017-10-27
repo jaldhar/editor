@@ -24,7 +24,7 @@ Evaluate::Evaluate(Subeditor* subeditor) : _keymap {
 }, _subeditor{subeditor} {
 }
 
-bool Evaluate::operator()(char c) {
+bool Evaluate::operator()(int c) {
     bool isExit = false;
     bool isArg = false;
     int arg = 1;

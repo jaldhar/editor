@@ -25,6 +25,6 @@ bool Key::fini() {
     return true;
 }
 
-char Key::get() {
-    return (char)getch();
+int Key::get() {
+    return getch();
 }

@@ -24,7 +24,7 @@ int main(int argc, const char* argv[]) {
     window.init("Editor");
     key.init();
     
-    char c;
+    int c;
     redisplay();
     while(true) {
         c = key.get();

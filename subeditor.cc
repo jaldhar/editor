@@ -27,7 +27,7 @@ size_t Subeditor::point() {
 }
 
 bool Subeditor::insertACharacter(bool& /*isArg*/, int& arg,
-bool& /*isExit*/, char c) {
+bool& /*isExit*/, int c) {
     if (arg < 0) {
         arg = -arg;
     }
@@ -42,21 +42,21 @@ bool& /*isExit*/, char c) {
 }
 
 bool Subeditor::moveBackwardACharacter(bool& /*isArg*/, int& arg,
-bool& /*isExit*/, char /*c*/) {
+bool& /*isExit*/, int /*c*/) {
     arg = -1;
     _buffer.pointMove(arg);
     return true;
 }
 
 bool Subeditor::moveForwardACharacter(bool& /*isArg*/, int& arg,
-bool& /*isExit*/, char /*c*/) {
+bool& /*isExit*/, int /*c*/) {
     arg = 1;
     _buffer.pointMove(arg);
     return true;
 }
 
 bool Subeditor::deletePreviousCharacter(bool& /*isArg*/, int& arg,
-    bool& /*isExit*/, char /*c*/) {
+    bool& /*isExit*/, int /*c*/) {
     while (arg-- > 0) {
         if (_buffer.deletePrevious()) {
             return false;
@@ -66,7 +66,7 @@ bool Subeditor::deletePreviousCharacter(bool& /*isArg*/, int& arg,
 }
 
 bool Subeditor::deleteNextCharacter(bool& /*isArg*/, int& arg,
-    bool& /*isExit*/, char /*c*/) {
+    bool& /*isExit*/, int /*c*/) {
     while (arg-- > 0) {
         if (_buffer.deleteNext()) {
             return false;
@@ -75,7 +75,8 @@ bool Subeditor::deleteNextCharacter(bool& /*isArg*/, int& arg,
     return true;
 }
 
-bool Subeditor::quit(bool& /*isArg*/, int& /*arg*/, bool& isExit, char /*c*/) {
+bool Subeditor::quit(bool& /*isArg*/, int& /*arg*/, bool& isExit,
+int /*c*/) {
     isExit = true;
 
     return true;

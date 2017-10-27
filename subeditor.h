@@ -18,12 +18,12 @@ public:
     size_t bufferEnd();
     size_t point();
 
-    bool insertACharacter(bool& isArg, int& arg, bool& isExit, char c);
-    bool moveBackwardACharacter(bool& isArg, int& arg, bool& isExit, char c);
-    bool moveForwardACharacter(bool& isArg, int& arg, bool& isExit, char c);
-    bool deletePreviousCharacter(bool& isArg, int& arg, bool& isExit, char c);
-    bool deleteNextCharacter(bool& isArg, int& arg, bool& isExit, char c);
-    bool quit(bool& isArg, int& arg, bool& isExit, char c);
+    bool insertACharacter(bool& isArg, int& arg, bool& isExit, int c);
+    bool moveBackwardACharacter(bool& isArg, int& arg, bool& isExit,int c);
+    bool moveForwardACharacter(bool& isArg, int& arg, bool& isExit, int c);
+    bool deletePreviousCharacter(bool& isArg, int& arg, bool& isExit, int c);
+    bool deleteNextCharacter(bool& isArg, int& arg, bool& isExit, int c);
+    bool quit(bool& isArg, int& arg, bool& isExit, int c);
 
 private:
     friend Redisplay;

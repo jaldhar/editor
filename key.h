@@ -10,7 +10,7 @@ class Key {
 public:
     bool init();
     bool fini();
-    char get();
+    int  get();
 };
 
 #endif

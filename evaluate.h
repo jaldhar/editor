@@ -12,14 +12,14 @@
 
 class Subeditor;
 using COMMAND = 
-  std::function<bool(Subeditor*, bool& isArg, int& arg, bool& isExit, char c)>;
+  std::function<bool(Subeditor*, bool& isArg, int& arg, bool& isExit, int c)>;
 
 class Evaluate {
 public:
     Evaluate(Subeditor* subeditor);
-    bool operator()(char c);
+    bool operator()(int c);
 private:
-    std::map<char, COMMAND> _keymap;
+    std::map<int, COMMAND>  _keymap;
     Subeditor*              _subeditor;
 };
 
