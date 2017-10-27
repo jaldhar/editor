@@ -139,6 +139,15 @@ public:
         };
     }
 
+    friend void swap(Buffer<T>& lhs, Buffer<T>& rhs) {
+        if (lhs != rhs) {
+            lhs._text.swap(rhs._text);
+            std::swap(lhs._point, rhs._point);
+            std::swap(lhs._gapStart, rhs._gapStart);
+            std::swap(lhs._gapEnd, rhs._gapEnd);
+        }
+    }
+
 private:
     friend iterator;
     friend Redisplay;
@@ -320,6 +329,13 @@ public:
 
     reference operator[](const difference_type& n) const {
         return *(_i + n);
+    }
+
+    friend void swap(BufferIterator<T>& lhs, BufferIterator<T>& rhs) {
+        if (lhs != rhs) {
+            lhs._b.swap(rhs._b);
+            std::swap(lhs._i, rhs._i);
+        }
     }
 
 private:
