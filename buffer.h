@@ -69,8 +69,7 @@ public:
     }
 
     bool deletePrevious() {
-        BUFFER::iterator loc = userToGap(_point);
-        if (loc <= _text.begin() || loc > _text.end()) {
+        if (_point <= 0 || _point > static_cast<difference_type>(size())) {
             return false;
         }
 
@@ -80,8 +79,7 @@ public:
     }
 
     bool deleteNext() {
-        BUFFER::iterator loc = userToGap(_point);
-        if (loc < _text.begin() || loc >= _text.end()) {
+        if (_point < 0 || _point >= static_cast<difference_type>(size())) {
             return false;
         }
 
@@ -91,8 +89,7 @@ public:
     }
 
     bool insert(value_type c) {
-        BUFFER::iterator loc = userToGap(_point);
-        if (loc < _text.begin() || loc > _text.end()) {
+        if (_point < 0 || _point > static_cast<difference_type>(size())) {
             return false;
         }
 
@@ -107,12 +104,12 @@ public:
     }
 
     bool pointMove(int count) {
-        BUFFER::iterator loc = userToGap(_point + count);
-        if (loc < _text.begin() || loc > _text.end()) {
+        difference_type loc = _point + count;
+        if (loc < 0 || loc > static_cast<difference_type>(size())) {
             return false;
         }
 
-        return pointSet(loc);
+        return pointSet(userToGap(loc));
     }
 
     bool pointSet(BUFFER::iterator loc) {
