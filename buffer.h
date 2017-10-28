@@ -33,7 +33,7 @@ public:
     using reference = T&;
     using const_reference = const T&;
     using iterator = BufferIterator<T>;
-    using const_iterator = const iterator;
+    using const_iterator = BufferIterator<const T>;
     using difference_type = ptrdiff_t;
     using size_type = size_t;
 
