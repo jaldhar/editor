@@ -160,7 +160,7 @@ private:
             return;
         }
 
-        size_t n;
+        difference_type n;
         if (_gapStart < p) { // point is after gapStart
             n = p - _gapEnd;
             copy(p - n , p, _gapStart);
@@ -209,9 +209,12 @@ public:
     BufferIterator() : _b{nullptr}, _i{nullptr} {
     }
 
-    BufferIterator(Buffer<T>& b, difference_type i = 0) : _b{b},
-    _i{_b._text.begin()} {
-        _i += i;
+    BufferIterator(Buffer<T>& b) : _b{b} {
+        if (b._gapStart == b._text.begin() && _b.size()) {
+            _i = b._gapEnd;
+        } else {
+            _i = b._text.begin();
+        }
     }
 
     BufferIterator(const BufferIterator<T>& that) : _b(that._b),
