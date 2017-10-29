@@ -53,7 +53,7 @@ public:
     }
 
     reference operator[](difference_type n) {
-        return iterator(*this, n);
+        return iterator(*this)[n];
     }
 
     iterator begin() {
@@ -65,7 +65,7 @@ public:
     }
 
     iterator end() {
-        return iterator(*this, size());
+        return iterator(*this) +  size();
     }
 
     bool deletePrevious() {
