@@ -52,8 +52,8 @@ public:
         return !operator==(that);
     }
 
-    reference operator[](difference_type loc) {
-        return iterator(*this)[loc];
+    reference operator[](difference_type n) {
+        return iterator(*this, n);
     }
 
     iterator begin() {
@@ -65,7 +65,7 @@ public:
     }
 
     iterator end() {
-        return iterator(*this) + size();
+        return iterator(*this, size());
     }
 
     bool deletePrevious() {
@@ -187,9 +187,11 @@ private:
 
     difference_type gapToUser(BUFFER::iterator i) {
         difference_type p = distance(_text.begin(), i);
+
         if (i > _gapEnd) {
             p -= (_gapEnd - _gapStart);
         }
+
         return p;
     }
 };
@@ -207,7 +209,9 @@ public:
     BufferIterator() : _b{nullptr}, _i{nullptr} {
     }
 
-    BufferIterator(Buffer<T>& b) : _b{b}, _i{_b._text.begin()} {
+    BufferIterator(Buffer<T>& b, difference_type i = 0) : _b{b},
+    _i{_b._text.begin()} {
+        _i += i;
     }
 
     BufferIterator(const BufferIterator<T>& that) : _b(that._b),
