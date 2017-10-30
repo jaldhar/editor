@@ -37,18 +37,32 @@ public:
     using difference_type = ptrdiff_t;
     using size_type = size_t;
 
-    Buffer() : _text(BUFFERSIZE, 0), _point{0},
-    _gapStart{_text.begin()}, _gapEnd{_text.end()} {
+    Buffer() : _text(BUFFERSIZE, 0), _point{0}, _gapStart{_text.begin()},
+    _gapEnd{_text.end()} {
     };
 
-    bool operator==(const Buffer& that) const {
+    Buffer(const Buffer<T>& that) : _text(that._text), _point{that._point},
+    _gapStart{that._gapStart}, _gapEnd{that._gapEnd} {
+    }
+
+    Buffer<T>& operator=(const Buffer<T>& that) {
+        if (this != &that) {
+            this->_text = that._text;
+            this->_point = that._point;
+            this->_gapStart = that._gapStart;
+            this->_gapEnd = that._gapEnd;
+        }
+        return *this;
+    }
+
+    bool operator==(const Buffer<T>& that) const {
         return this->_text == that._text &&
             this->_point == that._point &&
             this->_gapStart == that._gapStart &&
             this->_gapEnd == that._gapEnd;
     };
 
-    bool operator!=(const Buffer& that) const {
+    bool operator!=(const Buffer<T>& that) const {
         return !operator==(that);
     }
 
@@ -62,6 +76,14 @@ public:
 
     size_type capacity() {
         return _text.size();
+    }
+
+    const_iterator cbegin() {
+        return const_cast<const Buffer<T>&>(*this).begin();
+    }
+
+    const_iterator cend() {
+        return const_cast<const Buffer<T>&>(*this).end();
     }
 
     iterator end() {
@@ -88,6 +110,10 @@ public:
         return true;
     }
 
+    bool empty() {
+        return size() ? false : true;
+    }
+
     bool insert(value_type c) {
         if (_point < 0 || _point > static_cast<difference_type>(size())) {
             return false;
@@ -99,7 +125,11 @@ public:
         return pointMove(1);
     }
 
-    ptrdiff_t point() const {
+    size_type max_size() {
+        return _text.max_size();
+    }
+
+    difference_type point() const {
         return _point;
     }
 
