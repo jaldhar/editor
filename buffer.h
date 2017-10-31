@@ -12,7 +12,6 @@
 #include <iterator>
 #include <vector>
 
-static constexpr size_t BUFFERSIZE = 80;
 using BUFFER = std::vector<char>;
 
 struct BufferInternals {
@@ -75,7 +74,7 @@ public:
     }
 
     size_type capacity() {
-        return _text.size();
+        return _text.capacity();
     }
 
     const_iterator cbegin() {
@@ -153,7 +152,7 @@ public:
     }
 
     size_type size() {
-        return _text.size() - (_gapEnd - _gapStart);
+        return _text.capacity() - (_gapEnd - _gapStart);
     }
 
     BufferInternals internals()  {
@@ -179,12 +178,21 @@ private:
     friend iterator;
     friend Redisplay;
 
+    static constexpr size_t BUFFERSIZE = 80;
+
     BUFFER           _text;
     difference_type  _point;
     BUFFER::iterator _gapStart;
     BUFFER::iterator _gapEnd;
 
     void moveGap() {
+        if (_gapStart == _gapEnd) {
+            _text.resize(_text.capacity() + BUFFERSIZE, 0);
+            _text.shrink_to_fit();
+            _gapStart = _text.end() - BUFFERSIZE;
+            _gapEnd = _text.end();
+        }
+
         BUFFER::iterator p = userToGap(_point);
         if (p == _gapStart) {
             return;
@@ -240,7 +248,7 @@ public:
     }
 
     BufferIterator(Buffer<T>& b) : _b{b} {
-        if (b._gapStart == b._text.begin() && _b.size()) {
+        if (b._gapStart == b._text.begin() && !_b.empty()) {
             _i = b._gapEnd;
         } else {
             _i = b._text.begin();
