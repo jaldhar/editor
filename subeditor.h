@@ -18,11 +18,11 @@ public:
     size_t bufferEnd();
     size_t point();
 
-    bool insertACharacter(bool& isArg, int& arg, bool& isExit, int c);
-    bool moveBackwardACharacter(bool& isArg, int& arg, bool& isExit,int c);
-    bool moveForwardACharacter(bool& isArg, int& arg, bool& isExit, int c);
-    bool deletePreviousCharacter(bool& isArg, int& arg, bool& isExit, int c);
-    bool deleteNextCharacter(bool& isArg, int& arg, bool& isExit, int c);
+    bool self_insert(bool& isArg, int& arg, bool& isExit, int c);
+    bool backward_char(bool& isArg, int& arg, bool& isExit,int c);
+    bool forward_char(bool& isArg, int& arg, bool& isExit, int c);
+    bool backward_delete_char(bool& isArg, int& arg, bool& isExit, int c);
+    bool delete_char(bool& isArg, int& arg, bool& isExit, int c);
     bool quit(bool& isArg, int& arg, bool& isExit, int c);
 
 private:

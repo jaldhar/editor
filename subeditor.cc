@@ -26,7 +26,7 @@ size_t Subeditor::point() {
     return static_cast<size_t>(_buffer.point());
 }
 
-bool Subeditor::insertACharacter(bool& /*isArg*/, int& arg,
+bool Subeditor::self_insert(bool& /*isArg*/, int& arg,
 bool& /*isExit*/, int c) {
     if (arg < 0) {
         arg = -arg;
@@ -41,21 +41,21 @@ bool& /*isExit*/, int c) {
     return true;
 }
 
-bool Subeditor::moveBackwardACharacter(bool& /*isArg*/, int& arg,
+bool Subeditor::backward_char(bool& /*isArg*/, int& arg,
 bool& /*isExit*/, int /*c*/) {
     arg = -1;
     _buffer.pointMove(arg);
     return true;
 }
 
-bool Subeditor::moveForwardACharacter(bool& /*isArg*/, int& arg,
+bool Subeditor::forward_char(bool& /*isArg*/, int& arg,
 bool& /*isExit*/, int /*c*/) {
     arg = 1;
     _buffer.pointMove(arg);
     return true;
 }
 
-bool Subeditor::deletePreviousCharacter(bool& /*isArg*/, int& arg,
+bool Subeditor::backward_delete_char(bool& /*isArg*/, int& arg,
     bool& /*isExit*/, int /*c*/) {
     while (arg-- > 0) {
         if (_buffer.deletePrevious()) {
@@ -65,7 +65,7 @@ bool Subeditor::deletePreviousCharacter(bool& /*isArg*/, int& arg,
     return true;
 }
 
-bool Subeditor::deleteNextCharacter(bool& /*isArg*/, int& arg,
+bool Subeditor::delete_char(bool& /*isArg*/, int& arg,
     bool& /*isExit*/, int /*c*/) {
     while (arg-- > 0) {
         if (_buffer.deleteNext()) {
