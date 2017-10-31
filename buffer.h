@@ -1,4 +1,4 @@
-// Buffer -- manages text in a text editor (Interface and Implementation)
+// Buffer -- manages text in a text editor (Interface)
 //
 // By Jaldhar H. Vyas <jaldhar@braincells.com>
 // Copyright (C) 2017, Consolidated Braincells Inc. All rights reserved.
@@ -7,9 +7,6 @@
 #ifndef _BUFFER_H_
 #define _BUFFER_H_
 
-#include <algorithm>
-#include <cstdlib>
-#include <iterator>
 #include <vector>
 
 using BUFFER = std::vector<char>;
@@ -36,143 +33,33 @@ public:
     using difference_type = ptrdiff_t;
     using size_type = size_t;
 
-    Buffer() : _text(BUFFERSIZE, 0), _point{0}, _gapStart{_text.begin()},
-    _gapEnd{_text.end()} {
-    };
+    Buffer();
+    Buffer(const Buffer<T>& that);
 
-    Buffer(const Buffer<T>& that) : _text(that._text), _point{that._point},
-    _gapStart{that._gapStart}, _gapEnd{that._gapEnd} {
-    }
+    Buffer<T>& operator=(const Buffer<T>& that);
+    bool       operator==(const Buffer<T>& that) const;
+    bool       operator!=(const Buffer<T>& that) const;
+    reference  operator[](difference_type n);
 
-    Buffer<T>& operator=(const Buffer<T>& that) {
-        if (this != &that) {
-            this->_text = that._text;
-            this->_point = that._point;
-            this->_gapStart = that._gapStart;
-            this->_gapEnd = that._gapEnd;
-        }
-        return *this;
-    }
+    iterator begin();
+    iterator end();
 
-    bool operator==(const Buffer<T>& that) const {
-        return this->_text == that._text &&
-            this->_point == that._point &&
-            this->_gapStart == that._gapStart &&
-            this->_gapEnd == that._gapEnd;
-    };
+    const_iterator cbegin();
+    const_iterator cend();
 
-    bool operator!=(const Buffer<T>& that) const {
-        return !operator==(that);
-    }
+    size_type capacity();
+    bool      empty();
+    size_type max_size();
+    size_type size();
 
-    reference operator[](difference_type n) {
-        return iterator(*this)[n];
-    }
+    bool            deletePrevious();
+    bool            deleteNext();
+    bool            insert(value_type c);
+    difference_type point() const;
+    bool            pointMove(int count);
+    bool            pointSet(BUFFER::iterator loc);
 
-    iterator begin() {
-        return iterator(*this);
-    }
-
-    size_type capacity() {
-        return _text.capacity();
-    }
-
-    const_iterator cbegin() {
-        return const_cast<const Buffer<T>&>(*this).begin();
-    }
-
-    const_iterator cend() {
-        return const_cast<const Buffer<T>&>(*this).end();
-    }
-
-    iterator end() {
-        return iterator(*this) +  size();
-    }
-
-    bool deletePrevious() {
-        if (_point <= 0 || _point > static_cast<difference_type>(size())) {
-            return false;
-        }
-
-        moveGap();
-        _gapStart--;
-        return pointMove(-1);
-    }
-
-    bool deleteNext() {
-        if (_point < 0 || _point >= static_cast<difference_type>(size())) {
-            return false;
-        }
-
-        moveGap();
-        _gapEnd++;
-        return true;
-    }
-
-    bool empty() {
-        return size() ? false : true;
-    }
-
-    bool insert(value_type c) {
-        if (_point < 0 || _point > static_cast<difference_type>(size())) {
-            return false;
-        }
-
-        moveGap();
-        *_gapStart = c;
-        _gapStart++;
-        return pointMove(1);
-    }
-
-    size_type max_size() {
-        return _text.max_size();
-    }
-
-    difference_type point() const {
-        return _point;
-    }
-
-    bool pointMove(int count) {
-        difference_type loc = _point + count;
-        if (loc < 0 || loc > static_cast<difference_type>(size())) {
-            return false;
-        }
-
-        return pointSet(userToGap(loc));
-    }
-
-    bool pointSet(BUFFER::iterator loc) {
-        if (loc < _text.begin() || loc > _text.end()) {
-            return false;
-        }
-
-        _point = gapToUser(loc);
-
-        return true;
-    }
-
-    size_type size() {
-        return _text.capacity() - (_gapEnd - _gapStart);
-    }
-
-    BufferInternals internals()  {
-        return {
-            capacity(),
-            distance(_text.begin(), userToGap(_point)),
-            size(),
-            distance(_text.begin(), _gapStart),
-            distance(_text.begin(), _gapEnd)
-        };
-    }
-
-    friend void swap(Buffer<T>& lhs, Buffer<T>& rhs) {
-        if (lhs != rhs) {
-            lhs._text.swap(rhs._text);
-            std::swap(lhs._point, rhs._point);
-            std::swap(lhs._gapStart, rhs._gapStart);
-            std::swap(lhs._gapEnd, rhs._gapEnd);
-        }
-    }
+    BufferInternals internals();
 
 private:
     friend iterator;
@@ -185,54 +72,13 @@ private:
     BUFFER::iterator _gapStart;
     BUFFER::iterator _gapEnd;
 
-    void moveGap() {
-        if (_gapStart == _gapEnd) {
-            _text.resize(_text.capacity() + BUFFERSIZE, 0);
-            _text.shrink_to_fit();
-            _gapStart = _text.end() - BUFFERSIZE;
-            _gapEnd = _text.end();
-        }
-
-        BUFFER::iterator p = userToGap(_point);
-        if (p == _gapStart) {
-            return;
-        }
-
-        difference_type n;
-        if (_gapStart < p) { // point is after gapStart
-            n = p - _gapEnd;
-            copy(p - n , p, _gapStart);
-            _gapStart += n;
-            _gapEnd += n;
-            _point = gapToUser(_gapStart);
-        } else { // point is before _gapStart
-            n = _gapStart - p;
-            _gapStart -= n;
-            _gapEnd -= n;
-            copy(p, p + n, _gapEnd);
-        }
-    }
-
-    BUFFER::iterator userToGap(difference_type p) {
-        BUFFER::iterator i = _text.begin() + p;
-
-        if (i > _gapStart) {
-            i += (_gapEnd - _gapStart);
-        }
-
-        return i;
-    }
-
-    difference_type gapToUser(BUFFER::iterator i) {
-        difference_type p = distance(_text.begin(), i);
-
-        if (i > _gapEnd) {
-            p -= (_gapEnd - _gapStart);
-        }
-
-        return p;
-    }
+    void             moveGap();
+    BUFFER::iterator userToGap(difference_type p);
+    difference_type  gapToUser(BUFFER::iterator i);
 };
+
+template<typename T>
+void std::swap(Buffer<T>& lhs, Buffer<T>& rhs);
 
 template<typename T>
 class BufferIterator {
@@ -244,146 +90,51 @@ public:
     using reference = typename Buffer<T>::reference;
     using iterator_category = std::random_access_iterator_tag;
 
-    BufferIterator() : _b{nullptr}, _i{nullptr} {
-    }
+    BufferIterator();
+    BufferIterator(Buffer<T>& b);
+    BufferIterator(const BufferIterator<T>& that);
 
-    BufferIterator(Buffer<T>& b) : _b{b} {
-        if (b._gapStart == b._text.begin() && !_b.empty()) {
-            _i = b._gapEnd;
-        } else {
-            _i = b._text.begin();
-        }
-    }
-
-    BufferIterator(const BufferIterator<T>& that) : _b(that._b),
-    _i{that._i} {
-    }
-
-    BufferIterator<T>& operator=(const BufferIterator<T>& that) {
-        if (this != &that) {
-            this->_b = that._b;
-            this->_i = that._i;
-        }
-        return *this;
-    }
-
-    bool operator==(const BufferIterator<T>& that) {
-        return _i == that._i;
-    }
-
-    bool operator!=(const BufferIterator<T>& that) {
-        return !this->operator==(that);
-    }
-
-    friend bool operator<(const BufferIterator<T>& lhs,
-    const BufferIterator<T>& rhs) {
-        return lhs._i < rhs._i;
-    }
-
-    friend bool operator>(const BufferIterator<T>& lhs,
-    const BufferIterator<T>& rhs) {
-        return lhs._i > rhs._i;
-    }
-
-    friend bool operator<=(const BufferIterator<T>& lhs,
-    const BufferIterator<T>& rhs) {
-        return !operator>(lhs, rhs);
-    }
-
-    friend bool operator>=(const BufferIterator<T>& lhs,
-    const BufferIterator<T>& rhs) {
-        return !operator<(lhs, rhs);
-    }
-
-    BufferIterator<T>& operator+=(const difference_type& n) {
-        auto count = n;
-
-        if (count >= 0) {
-            while (count--) {
-                ++_i;
-                if (_i == _b._gapStart) {
-                    _i += (_b._gapEnd - _b._gapStart);
-                }
-            }
-        } else {
-            while (count++) {
-                --_i;
-                if (_i == _b._gapEnd) {
-                    _i -= (_b._gapEnd - _b._gapStart);
-                }
-            }
-        }
-
-        return *this;
-    }
-
-    BufferIterator<T> operator+(const difference_type& n) {
-        return BufferIterator<T>(*this += n);
-    }
-
-    friend difference_type operator+(const BufferIterator<T>& lhs,
-    const BufferIterator<T>& rhs) {
-        return lhs._i + rhs._i;
-    }
-
-    BufferIterator<T>& operator++() {
-        this->operator+(1);
-        return *this;
-    }
-
-    BufferIterator<T> operator++(int) {
-        BufferIterator<T> tmp(*this);
-        operator++();
-        return tmp;
-    }
-
-    BufferIterator<T>& operator-=(const difference_type& n) {
-        return *this += -n;
-    }
-
-    BufferIterator<T> operator-(const difference_type& n) {
-        return BufferIterator<T>(*this - n);
-    }
-
-    friend difference_type operator-(const BufferIterator<T>& lhs,
-    const BufferIterator<T>& rhs) {
-        return lhs._i - rhs._i;
-    }
-
-    BufferIterator<T>& operator--() {
-        this->operator-(1);
-        return *this;
-    }
-
-    const BufferIterator<T>& operator--(int) {
-        BufferIterator<T> tmp(*this);
-        operator--();
-        return tmp;
-    }
-
-    reference operator*() const {
-        return *_i;
-    }
-
-    pointer operator->() const {
-        return _i;
-    }
-
-    reference operator[](const difference_type& n) const {
-        return *(_i + n);
-    }
-
-    friend void swap(BufferIterator<T>& lhs, BufferIterator<T>& rhs) {
-        if (lhs != rhs) {
-            lhs._b.swap(rhs._b);
-            std::swap(lhs._i, rhs._i);
-        }
-    }
+    BufferIterator<T>&       operator=(const BufferIterator<T>& that);
+    bool                     operator==(const BufferIterator<T>& that);
+    bool                     operator!=(const BufferIterator<T>& that);
+    BufferIterator<T>&       operator+=(const difference_type& n);
+    BufferIterator<T>        operator+(const difference_type& n);
+    BufferIterator<T>&       operator++();
+    BufferIterator<T>        operator++(int);
+    BufferIterator<T>&       operator-=(const difference_type& n);
+    BufferIterator<T>        operator-(const difference_type& n);
+    BufferIterator<T>&       operator--();
+    const BufferIterator<T>& operator--(int);
+    reference                operator*() const;
+    pointer                  operator->() const;
+    reference                operator[](const difference_type& n) const;
 
 private:
     Buffer<T>& _b;
     pointer    _i;
 
 };
+
+template<typename T>
+bool std::operator<(const BufferIterator<T>& lhs, const BufferIterator<T>& rhs);
+template<typename T>
+bool std::operator>(const BufferIterator<T>& lhs, const BufferIterator<T>& rhs);
+template<typename T>
+bool std::operator<=(const BufferIterator<T>& lhs,
+const BufferIterator<T>& rhs);
+template<typename T>
+bool std::operator>=(const BufferIterator<T>& lhs,
+const BufferIterator<T>& rhs);
+template<typename T>
+typename BufferIterator<T>::difference_type std::operator+(
+const BufferIterator<T>& lhs, const BufferIterator<T>& rhs);
+template<typename T>
+typename BufferIterator<T>::difference_type std::operator-(
+const BufferIterator<T>& lhs, const BufferIterator<T>& rhs);
+
+template<typename T>
+void std::swap(BufferIterator<T>& lhs, BufferIterator<T>& rhs);
+
+#include "buffer.inl"
 
 #endif
