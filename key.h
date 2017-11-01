@@ -10,6 +10,7 @@ class Key {
 public:
     bool init();
     bool fini();
+    void beep();
     int  get();
 };
 

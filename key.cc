@@ -25,6 +25,10 @@ bool Key::fini() {
     return true;
 }
 
+void Key::beep() {
+    ::beep();
+}
+
 int Key::get() {
     return getch();
 }
