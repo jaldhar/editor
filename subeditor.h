@@ -14,8 +14,8 @@ class Redisplay;
 class Subeditor {
 public:
     Subeditor();
-    size_t bufferStart();
-    size_t bufferEnd();
+
+    Buffer<char>& buffer();
     size_t point();
 
     bool self_insert(bool& isArg, int& arg, bool& isExit, int c);

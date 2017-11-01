@@ -14,12 +14,8 @@ using namespace std;
 Subeditor::Subeditor() : _buffer() {
 }
 
-size_t Subeditor::bufferStart() {
-    return 0;
-}
-
-size_t Subeditor::bufferEnd() {
-    return _buffer.size();
+Buffer<char>& Subeditor::buffer() {
+    return _buffer;
 }
 
 size_t Subeditor::point() {

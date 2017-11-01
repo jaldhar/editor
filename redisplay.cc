@@ -21,7 +21,7 @@ void Redisplay::operator()() {
 
     wmove(stdscr, 1 , 0);
     wclrtoeol(stdscr);
-    for (auto c: _subeditor->_buffer) {
+    for (auto c: _subeditor->buffer()) {
         waddch(stdscr, c);
     }
 
