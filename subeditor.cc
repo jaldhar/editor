@@ -30,7 +30,7 @@ bool& /*isExit*/, int c) {
 
     while (arg-- > 0) {
         if (!_buffer.insert(c)) {
-            return false;
+            break;
         }
     }
 
@@ -54,8 +54,8 @@ bool& /*isExit*/, int /*c*/) {
 bool Subeditor::backward_delete_char(bool& /*isArg*/, int& arg,
     bool& /*isExit*/, int /*c*/) {
     while (arg-- > 0) {
-        if (_buffer.deletePrevious()) {
-            return false;
+        if (!_buffer.deletePrevious()) {
+            break;
         }
     }
     return true;
@@ -64,8 +64,8 @@ bool Subeditor::backward_delete_char(bool& /*isArg*/, int& arg,
 bool Subeditor::delete_char(bool& /*isArg*/, int& arg,
     bool& /*isExit*/, int /*c*/) {
     while (arg-- > 0) {
-        if (_buffer.deleteNext()) {
-            return false;
+        if (!_buffer.deleteNext()) {
+            break;
         }
     }
     return true;

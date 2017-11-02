@@ -19,8 +19,8 @@ int main(int argc, const char* argv[]) {
     Window window;
     Key key;
     Subeditor subeditor;
-    Evaluate evaluate(&subeditor);
     Redisplay redisplay(&subeditor);
+    Evaluate evaluate(subeditor, key, redisplay);
     window.init("Editor");
     key.init();
     

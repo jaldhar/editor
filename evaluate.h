@@ -10,17 +10,21 @@
 #include <functional>
 #include <map>
 
+class Key;
+class Redisplay;
 class Subeditor;
 using COMMAND = 
-  std::function<bool(Subeditor*, bool& isArg, int& arg, bool& isExit, int c)>;
+  std::function<bool(Subeditor&, bool& isArg, int& arg, bool& isExit, int c)>;
 
 class Evaluate {
 public:
-    Evaluate(Subeditor* subeditor);
+    Evaluate(Subeditor& subeditor, Key& key, Redisplay& redisplay);
     bool operator()(int c);
 private:
     std::map<int, COMMAND>  _keymap;
-    Subeditor*              _subeditor;
+    Subeditor&              _subeditor;
+    Key&                    _key;
+    Redisplay&              _redisplay;
 };
 
 #endif
