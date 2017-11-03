@@ -82,7 +82,7 @@ Buffer<T, N, Container>::capacity() {
 
 template<typename T, std::size_t N, typename Container>
 bool Buffer<T, N, Container>::empty() {
-    return size() ? false : true;
+    return !size();
 }
 
 template<typename T, std::size_t N, typename Container>
@@ -233,15 +233,18 @@ void std::swap(Buffer<T, N, Container>& lhs, Buffer<T, N, Container>& rhs) {
 }
 
 template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>::BufferIterator() : _b{nullptr}, _i{nullptr} {
+BufferIterator<T, N, Container>::BufferIterator() : _b{nullptr},
+_i{nullptr} {
 }
 
 template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>::BufferIterator(Buffer<T, N, Container>& b) : _b{b} {
-    if (b._gapStart == b._text.begin() && !_b.empty()) {
-        _i = b._gapEnd;
+BufferIterator<T, N, Container>::BufferIterator(
+const Buffer<T, N, Container>& b) : _b{b} {
+    if (_b._gapStart == _b._text.begin() &&
+    !const_cast<Buffer<T, N, Container>&>(_b).empty()) {
+        _i = const_cast<Buffer<T, N, Container>&>(_b)._gapEnd;
     } else {
-        _i = b._text.begin();
+        _i = const_cast<Buffer<T, N, Container>&>(_b)._text.begin();
     }
 }
 

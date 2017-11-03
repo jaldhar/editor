@@ -88,7 +88,7 @@ public:
     using size_type = typename Container::size_type;
 
     BufferIterator();
-    BufferIterator(Buffer<T, N, Container>& b);
+    BufferIterator(const Buffer<T, N, Container>& b);
     BufferIterator(const BufferIterator<T, N, Container>& that);
 
     BufferIterator<T, N, Container>&
@@ -108,8 +108,8 @@ public:
     reference                              operator[](const size_type& n) const;
 
 private:
-    Buffer<T, N, Container>& _b;
-    pointer    _i;
+    const Buffer<T, N, Container>& _b;
+    pointer                        _i;
 
 };
 
