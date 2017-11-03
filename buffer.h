@@ -39,7 +39,7 @@ public:
     Buffer<T>& operator=(const Buffer<T>& that);
     bool       operator==(const Buffer<T>& that) const;
     bool       operator!=(const Buffer<T>& that) const;
-    reference  operator[](difference_type n);
+    reference  operator[](size_type n);
 
     iterator begin();
     iterator end();
@@ -65,7 +65,7 @@ private:
     friend iterator;
     friend Redisplay;
 
-    static constexpr size_t BUFFERSIZE = 80;
+    static constexpr size_type BUFFERSIZE = 80;
 
     BUFFER           _text;
     difference_type  _point;
@@ -89,6 +89,7 @@ public:
     using pointer = typename BUFFER::iterator;
     using reference = typename Buffer<T>::reference;
     using iterator_category = std::random_access_iterator_tag;
+    using size_type = typename Buffer<T>::size_type;
 
     BufferIterator();
     BufferIterator(Buffer<T>& b);
@@ -107,7 +108,7 @@ public:
     const BufferIterator<T>& operator--(int);
     reference                operator*() const;
     pointer                  operator->() const;
-    reference                operator[](const difference_type& n) const;
+    reference                operator[](const size_type& n) const;
 
 private:
     Buffer<T>& _b;

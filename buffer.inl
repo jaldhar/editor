@@ -43,7 +43,7 @@ bool Buffer<T>::operator!=(const Buffer<T>& that) const {
 }
 
 template<typename T>
-typename Buffer<T>::reference Buffer<T>::operator[](difference_type n) {
+typename Buffer<T>::reference Buffer<T>::operator[](size_type n) {
     return Buffer<T>::iterator(*this)[n];
 }
 
@@ -332,7 +332,7 @@ typename BufferIterator<T>::pointer BufferIterator<T>::operator->() const {
 
 template<typename T>
 typename BufferIterator<T>::reference BufferIterator<T>::operator[](
-const difference_type& n) const {
+const size_type& n) const {
     return *(_i + n);
 }
 
