@@ -14,7 +14,7 @@ using namespace std;
 Subeditor::Subeditor() : _buffer() {
 }
 
-Buffer<char>& Subeditor::buffer() {
+Buffer<char, Subeditor::BUFFERSIZE>& Subeditor::buffer() {
     return _buffer;
 }
 

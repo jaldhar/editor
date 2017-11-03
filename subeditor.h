@@ -12,10 +12,12 @@
 class Redisplay;
 
 class Subeditor {
+    static const std::size_t BUFFERSIZE = 80;
+
 public:
     Subeditor();
 
-    Buffer<char>& buffer();
+    Buffer<char, BUFFERSIZE>& buffer();
     size_t point();
 
     bool self_insert(bool& isArg, int& arg, bool& isExit, int c);
@@ -28,7 +30,7 @@ public:
 private:
     friend Redisplay;
 
-    Buffer<char>   _buffer;
+    Buffer<char, BUFFERSIZE>   _buffer;
 };
 
 #endif
