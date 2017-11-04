@@ -268,7 +268,7 @@ const BufferIterator<T, N,Container> & that) {
 template<typename T, std::size_t N, typename Container>
 bool BufferIterator<T, N, Container>::operator==(
 const BufferIterator<T, N, Container>& that) {
-    return _i == that._i;
+    return _b == that._b && _i == that._i;
 }
 
 template<typename T, std::size_t N, typename Container>
@@ -370,13 +370,13 @@ const size_type& n) const {
 template<typename T, std::size_t N, typename Container>
 bool std::operator<(const BufferIterator<T, N, Container>& lhs,
 const BufferIterator<T, N, Container>& rhs) {
-    return lhs._i < rhs._i;
+    return lhs._b == rhs._b && lhs._i < rhs._i;
 }
 
 template<typename T, std::size_t N, typename Container>
 bool std::operator>(const BufferIterator<T, N, Container>& lhs,
 const BufferIterator<T, N, Container>& rhs){
-    return lhs._i > rhs._i;
+    return lhs._b == rhs._b && lhs._i > rhs._i;
 }
 
 template<typename T, std::size_t N, typename Container>
@@ -408,7 +408,7 @@ const BufferIterator<T, N, Container>& rhs) {
 template<typename T, std::size_t N, typename Container>
 void std::swap(BufferIterator<T, N, Container>& lhs,
 BufferIterator<T, N, Container>& rhs) {
-    if (lhs != rhs) {
+    if (&lhs != &rhs) {
         lhs._b.swap(rhs._b);
         std::swap(lhs._i, rhs._i);
     }
