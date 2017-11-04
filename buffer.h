@@ -48,10 +48,10 @@ public:
     const_iterator cbegin() const;
     const_iterator cend() const;
 
-    size_type capacity();
-    bool      empty();
-    size_type max_size();
-    size_type size();
+    size_type capacity() const;
+    bool      empty() const;
+    size_type max_size() const;
+    size_type size() const;
 
     bool            deletePrevious();
     bool            deleteNext();

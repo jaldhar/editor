@@ -86,23 +86,23 @@ Buffer<T, N, Container>::cend() const {
 
 template<typename T, std::size_t N, typename Container>
 typename Buffer<T, N, Container>::size_type
-Buffer<T, N, Container>::capacity() {
+Buffer<T, N, Container>::capacity() const {
     return _text.capacity();
 }
 
 template<typename T, std::size_t N, typename Container>
-bool Buffer<T, N, Container>::empty() {
+bool Buffer<T, N, Container>::empty() const {
     return !size();
 }
 
 template<typename T, std::size_t N, typename Container>
 typename Buffer<T, N, Container>::size_type
-Buffer<T, N, Container>::max_size() {
+Buffer<T, N, Container>::max_size() const {
     return _text.max_size();
 }
 
 template<typename T, std::size_t N, typename Container>
-typename Buffer<T, N, Container>::size_type Buffer<T, N, Container>::size() {
+typename Buffer<T, N, Container>::size_type Buffer<T, N, Container>::size() const {
     return _text.capacity() - (_gapEnd - _gapStart);
 }
 
