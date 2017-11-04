@@ -63,15 +63,25 @@ typename Buffer<T, N, Container>::iterator Buffer<T, N, Container>::end() {
 }
 
 template<typename T, std::size_t N, typename Container>
-typename Buffer<T, N, Container>::const_iterator
-Buffer<T, N, Container>::cbegin() {
-    return const_cast<const Buffer<T, N, Container>&>(*this).begin();
+typename Buffer<T, N, Container>::const_iterator Buffer<T, N, Container>::begin() const {
+    return Buffer<T, N, Container>::const_iterator(*this);
+}
+
+template<typename T, std::size_t N, typename Container>
+typename Buffer<T, N, Container>::const_iterator Buffer<T, N, Container>::end() const {
+    return Buffer<T, N, Container>::const_iterator(*this) +  size();
 }
 
 template<typename T, std::size_t N, typename Container>
 typename Buffer<T, N, Container>::const_iterator
-Buffer<T, N, Container>::cend() {
-    return const_cast<const Buffer<T, N, Container>&>(*this).end();
+Buffer<T, N, Container>::cbegin() const {
+    return begin();
+}
+
+template<typename T, std::size_t N, typename Container>
+typename Buffer<T, N, Container>::const_iterator
+Buffer<T, N, Container>::cend() const {
+    return end();
 }
 
 template<typename T, std::size_t N, typename Container>
