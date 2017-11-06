@@ -291,23 +291,16 @@ const BufferIterator<T, N, Container>& that) {
 template<typename T, std::size_t N, typename Container>
 BufferIterator<T, N, Container>&
 BufferIterator<T, N, Container>::operator+=(const difference_type& n) {
-    auto count = n;
-
-    if (count >= 0) {
-        while (count--) {
-            ++_pos;
-            if (_pos == _buffer._gapStart) {
-                _pos += (_buffer._gapEnd - _buffer._gapStart);
-            }
+    if (n >= 0) {
+        if (_pos < _buffer._gapStart && _buffer._gapStart <= _pos + n) {
+            _pos += (_buffer._gapEnd - _buffer._gapStart);
         }
     } else {
-        while (count++) {
-            --_pos;
-            if (_pos == _buffer._gapEnd) {
-                _pos -= (_buffer._gapEnd - _buffer._gapStart);
-            }
+        if (_pos + n <= _buffer._gapEnd && _buffer._gapEnd < _pos) {
+            _pos -= (_buffer._gapEnd - _buffer._gapStart);
         }
     }
+    _pos += n;
 
     return *this;
 }
