@@ -33,8 +33,10 @@ public:
 
     Buffer();
     Buffer(const Buffer<T, N, Container>& that);
+    Buffer(Buffer<T, N, Container>&& that);
 
     Buffer<T, N, Container>& operator=(const Buffer<T, N, Container>& that);
+    Buffer<T, N, Container>& operator=(Buffer<T, N, Container>&& that);
     bool       operator==(const Buffer<T, N, Container>& that) const;
     bool       operator!=(const Buffer<T, N, Container>& that) const;
     reference  operator[](size_type n);

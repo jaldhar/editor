@@ -20,6 +20,12 @@ _gapEnd{that._gapEnd} {
 }
 
 template<typename T, std::size_t N, typename Container>
+Buffer<T, N, Container>::Buffer(Buffer<T, N, Container>&& that) :
+_text(std::move(that._text)), _point{that._point},
+_gapStart{std::move(that._gapStart)}, _gapEnd{std::move(that._gapEnd)} {
+}
+
+template<typename T, std::size_t N, typename Container>
 Buffer<T, N, Container>&
 Buffer<T, N, Container>::operator=(const Buffer<T, N, Container>& that) {
     if (this != &that) {
@@ -27,6 +33,18 @@ Buffer<T, N, Container>::operator=(const Buffer<T, N, Container>& that) {
         this->_point = that._point;
         this->_gapStart = that._gapStart;
         this->_gapEnd = that._gapEnd;
+    }
+    return *this;
+}
+
+template<typename T, std::size_t N, typename Container>
+Buffer<T, N, Container>&
+Buffer<T, N, Container>::operator=(Buffer<T, N, Container>&& that) {
+    if (this != &that) {
+        this->_text = std::move(that._text);
+        this->_point = that._point;
+        this->_gapStart = std::move(that._gapStart);
+        this->_gapEnd = std::move(that._gapEnd);
     }
     return *this;
 }
