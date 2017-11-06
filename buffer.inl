@@ -270,7 +270,7 @@ BufferIterator<T, N, Container>&
 BufferIterator<T, N, Container>::operator=(
 const BufferIterator<T, N,Container> & that) {
     if (this != &that) {
-        this->_buffer = that._buffer;
+        &this->_buffer = &that._buffer;
         this->_pos = that._pos;
     }
     return *this;
