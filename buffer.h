@@ -112,7 +112,7 @@ public:
 
 private:
     const Buffer<T, N, Container>& _buffer;
-    pointer                        _i;
+    pointer                        _pos;
 
 };
 
