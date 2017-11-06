@@ -213,7 +213,7 @@ typename Container::iterator
 Buffer<T, N, Container>::userToGap(difference_type p) {
     typename Container::iterator i = _text.begin() + p;
 
-    if (i > _gapStart) {
+    if (i >= _gapStart) {
         i += (_gapEnd - _gapStart);
     }
 
@@ -225,7 +225,7 @@ typename Buffer<T, N, Container>::difference_type
 Buffer<T, N, Container>::gapToUser(typename Container::iterator i) {
     Buffer<T, N, Container>::difference_type p = distance(_text.begin(), i);
 
-    if (i > _gapEnd) {
+    if (i >= _gapEnd) {
         p -= (_gapEnd - _gapStart);
     }
 
