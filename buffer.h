@@ -60,7 +60,7 @@ public:
     bool            insert(value_type c);
     difference_type point() const;
     bool            pointMove(int count);
-    bool            pointSet(typename Container::iterator loc);
+
 
     BufferInternals internals();
 
@@ -73,6 +73,7 @@ private:
     typename Container::iterator _gapStart;
     typename Container::iterator _gapEnd;
 
+    bool                         pointSet(typename Container::iterator loc);
     void                         moveGap();
     typename Container::iterator userToGap(difference_type p);
     difference_type              gapToUser(typename Container::iterator i);

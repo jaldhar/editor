@@ -176,17 +176,6 @@ bool Buffer<T, N, Container>::pointMove(int count) {
 }
 
 template<typename T, std::size_t N, typename Container>
-bool Buffer<T, N, Container>::pointSet(typename Container::iterator loc) {
-    if (loc < _text.begin() || loc > _text.end()) {
-        return false;
-    }
-
-    _point = gapToUser(loc);
-
-    return true;
-}
-
-template<typename T, std::size_t N, typename Container>
 BufferInternals Buffer<T, N, Container>::internals() {
     return {
         capacity(),
@@ -195,6 +184,17 @@ BufferInternals Buffer<T, N, Container>::internals() {
         distance(_text.begin(), _gapStart),
         distance(_text.begin(), _gapEnd)
     };
+}
+
+template<typename T, std::size_t N, typename Container>
+bool Buffer<T, N, Container>::pointSet(typename Container::iterator loc) {
+    if (loc < _text.begin() || loc > _text.end()) {
+        return false;
+    }
+
+    _point = gapToUser(loc);
+
+    return true;
 }
 
 template<typename T, std::size_t N, typename Container>
