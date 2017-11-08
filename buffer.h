@@ -4,8 +4,8 @@
 // Copyright (C) 2017, Consolidated Braincells Inc. All rights reserved.
 // "Do what thou wilt" shall be the whole of the license.
 
-#ifndef _Container_H_
-#define _Container_H_
+#ifndef _BUFFER_H_
+#define _BUFFER_H_
 
 #include <vector>
 
@@ -18,7 +18,6 @@ struct BufferInternals {
 };
 
 template<typename T, size_t N, typename Container> class BufferIterator;
-class Redisplay;
 
 template<typename T,  std::size_t N, typename Container = std::vector<T>>
 class Buffer {
@@ -66,7 +65,6 @@ public:
 
 private:
     friend iterator;
-    friend Redisplay;
 
     Container                    _text;
     difference_type              _point;

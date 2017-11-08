@@ -9,8 +9,6 @@
 
 #include "buffer.h"
 
-class Redisplay;
-
 class Subeditor {
     static const std::size_t BUFFERSIZE = 80;
 
@@ -28,8 +26,6 @@ public:
     bool quit(bool& isArg, int& arg, bool& isExit, int c);
 
 private:
-    friend Redisplay;
-
     Buffer<char, BUFFERSIZE>   _buffer;
 };
 
