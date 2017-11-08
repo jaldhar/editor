@@ -73,7 +73,6 @@ private:
     typename Container::iterator _gapStart;
     typename Container::iterator _gapEnd;
 
-    bool                         pointSet(typename Container::iterator loc);
     void                         moveGap();
     typename Container::iterator userToGap(difference_type p);
     difference_type              gapToUser(typename Container::iterator i);
