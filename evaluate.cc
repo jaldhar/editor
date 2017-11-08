@@ -10,10 +10,10 @@ using namespace std;
 #include <curses.h>
 #include "evaluate.h"
 #include "key.h"
-#include "redisplay.h"
 #include "subeditor.h"
+#include "window.h"
 
-Evaluate::Evaluate(Subeditor& subeditor, Key& key, Redisplay& redisplay) :
+Evaluate::Evaluate(Subeditor& subeditor, Key& key, Window& window) :
 _keymap {
     { 0x06, &Subeditor::forward_char }, // CTRL-f
     { KEY_RIGHT, &Subeditor::forward_char },
@@ -24,7 +24,7 @@ _keymap {
     { 0x04, &Subeditor::delete_char }, // CTRL-d
     { KEY_DC, &Subeditor::delete_char },
     { 0x11, &Subeditor::quit }, // CTRL-q
-}, _subeditor{subeditor}, _key{key}, _redisplay{redisplay} {
+}, _subeditor{subeditor}, _key{key}, _window{window} {
 }
 
 bool Evaluate::operator()(int c) {
@@ -42,7 +42,7 @@ bool Evaluate::operator()(int c) {
     } else {
         while (!(it->second)(_subeditor, isArg, arg, isExit, c)) {
             c = _key.get();
-            _redisplay();
+            _window.redisplay(_subeditor);
         }
     }
 

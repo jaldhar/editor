@@ -11,20 +11,20 @@
 #include <map>
 
 class Key;
-class Redisplay;
 class Subeditor;
+class Window;
 using COMMAND = 
   std::function<bool(Subeditor&, bool& isArg, int& arg, bool& isExit, int c)>;
 
 class Evaluate {
 public:
-    Evaluate(Subeditor& subeditor, Key& key, Redisplay& redisplay);
+    Evaluate(Subeditor& subeditor, Key& key, Window& window);
     bool operator()(int c);
 private:
     std::map<int, COMMAND>  _keymap;
     Subeditor&              _subeditor;
     Key&                    _key;
-    Redisplay&              _redisplay;
+    Window&                 _window;
 };
 
 #endif

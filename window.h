@@ -10,10 +10,16 @@
 #include <curses.h>
 #include <string>
 
+class Subeditor;
+
 class Window {
 public:
     bool init(std::string display);
     int  fini();
+    void redisplay(Subeditor& subeditor);
+    void resize();
+    void setTitle(const std::string& display);
+    const WINDOW* viewport() const;
 };
 
 #endif

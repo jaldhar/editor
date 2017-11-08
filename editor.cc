@@ -8,7 +8,6 @@ using namespace std;
 
 #include "evaluate.h"
 #include "key.h"
-#include "redisplay.h"
 #include "subeditor.h"
 #include "window.h"
 
@@ -19,19 +18,20 @@ int main(int argc, const char* argv[]) {
     Window window;
     Key key;
     Subeditor subeditor;
-    Redisplay redisplay(&subeditor);
-    Evaluate evaluate(subeditor, key, redisplay);
     window.init("Editor");
+    Evaluate evaluate(subeditor, key, window);
     key.init();
     
     int c;
-    redisplay();
+    window.redisplay(subeditor);
     while(true) {
         c = key.get();
-        if (evaluate(c)) {
+        if (c == KEY_RESIZE) { // Special NCurses SIGWINCH handler.
+            window.resize();
+        } else if (evaluate(c)) {
             break;
         }
-        redisplay();
+        window.redisplay(subeditor);
     }
 
     key.fini();
