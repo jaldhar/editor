@@ -125,6 +125,18 @@ typename Buffer<T, N, Container>::size_type Buffer<T, N, Container>::size() cons
 }
 
 template<typename T, std::size_t N, typename Container>
+typename Buffer<T, N, Container>::size_type
+Buffer<T,N,Container>::front() const {
+    return 0;
+}
+
+template<typename T, std::size_t N, typename Container>
+typename Buffer<T, N, Container>::size_type
+Buffer<T,N,Container>::back() const {
+    return (size() == 0) ? 0 : size() - 1;
+}
+
+template<typename T, std::size_t N, typename Container>
 bool Buffer<T, N, Container>::deletePrevious() {
     if (_point <= 0 || _point > static_cast<difference_type>(size())) {
         return false;

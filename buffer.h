@@ -53,6 +53,8 @@ public:
     bool      empty() const;
     size_type max_size() const;
     size_type size() const;
+    size_type front() const;
+    size_type back() const;
 
     bool            deletePrevious();
     bool            deleteNext();
