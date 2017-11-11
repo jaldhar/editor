@@ -67,27 +67,28 @@ const Buffer<T, N, Container>& that) const {
 template<typename T, std::size_t N, typename Container>
 typename Buffer<T, N, Container>::reference
 Buffer<T, N, Container>::operator[](size_type n) {
-    return Buffer<T, N, Container>::iterator(*this)[n];
+    return Buffer<T, N, Container>::iterator(this)[n];
 }
 
 template<typename T, std::size_t N, typename Container>
 typename Buffer<T, N, Container>::iterator Buffer<T, N, Container>::begin() {
-    return Buffer<T, N, Container>::iterator(*this);
+    return Buffer<T, N, Container>::iterator(this);
 }
 
 template<typename T, std::size_t N, typename Container>
 typename Buffer<T, N, Container>::iterator Buffer<T, N, Container>::end() {
-    return Buffer<T, N, Container>::iterator(*this) +  size();
+    return Buffer<T, N, Container>::iterator(this) +  size();
 }
 
 template<typename T, std::size_t N, typename Container>
 typename Buffer<T, N, Container>::const_iterator Buffer<T, N, Container>::begin() const {
-    return Buffer<T, N, Container>::const_iterator(*this);
+    return const_iterator(
+        *(const_cast<Buffer<T, N, Container> *>(this)));
 }
 
 template<typename T, std::size_t N, typename Container>
 typename Buffer<T, N, Container>::const_iterator Buffer<T, N, Container>::end() const {
-    return Buffer<T, N, Container>::const_iterator(*this) +  size();
+    return Buffer<T, N, Container>::const_iterator(this) +  size();
 }
 
 template<typename T, std::size_t N, typename Container>
@@ -177,6 +178,12 @@ Buffer<T, N, Container>::point() const {
 }
 
 template<typename T, std::size_t N, typename Container>
+bool Buffer<T, N, Container>::pointSet(difference_type n) {
+    _point = n;
+    return true;
+}
+
+template<typename T, std::size_t N, typename Container>
 bool Buffer<T, N, Container>::pointMove(int count) {
     Buffer<T, N, Container>::difference_type loc = _point + count;
     if (loc < 0 ||
@@ -262,33 +269,33 @@ void std::swap(Buffer<T, N, Container>& lhs, Buffer<T, N, Container>& rhs) {
     }
 }
 
-template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>::BufferIterator() : _buffer{nullptr},
+template<typename T, typename T_nonconst, typename elem_type>
+BufferIterator<T, T_nonconst, elem_type>::BufferIterator() : _buffer{nullptr},
 _pos{nullptr} {
 }
 
-template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>::BufferIterator(
-const Buffer<T, N, Container>& buffer) : _buffer{buffer} {
-    auto& b = const_cast<Buffer<T, N, Container>&>(_buffer);
+template<typename T, typename T_nonconst, typename elem_type>
+BufferIterator<T, T_nonconst, elem_type>::BufferIterator(const T* buffer) :
+_buffer{buffer} {
+    auto b = const_cast<T*>(_buffer);
 
-    if (b._gapStart == b._text.begin() && !b.empty()) {
-        _pos = b._gapEnd;
+    if (b->_gapStart == b->_text.begin() && !b->empty()) {
+        _pos = b->_gapEnd;
     } else {
-        _pos = b._text.begin();
+        _pos = b->_text.begin();
     }
 }
 
-template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>::BufferIterator(
-const BufferIterator<T, N, Container>& that) : _buffer(that._buffer),
+template<typename T, typename T_nonconst, typename elem_type>
+BufferIterator<T, T_nonconst, elem_type>::BufferIterator(
+const BufferIterator<T, T_nonconst, elem_type>& that) : _buffer(that._buffer),
 _pos{that._pos} {
 }
 
-template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>&
-BufferIterator<T, N, Container>::operator=(
-const BufferIterator<T, N,Container> & that) {
+template<typename T, typename T_nonconst, typename elem_type>
+BufferIterator<T, T_nonconst, elem_type>&
+BufferIterator<T, T_nonconst, elem_type>::operator=(
+const BufferIterator<T, T_nonconst, elem_type>& that) {
     if (this != &that) {
         &this->_buffer = &that._buffer;
         this->_pos = that._pos;
@@ -296,28 +303,28 @@ const BufferIterator<T, N,Container> & that) {
     return *this;
 }
 
-template<typename T, std::size_t N, typename Container>
-bool BufferIterator<T, N, Container>::operator==(
-const BufferIterator<T, N, Container>& that) {
+template<typename T, typename T_nonconst, typename elem_type>
+bool BufferIterator<T, T_nonconst, elem_type>::operator==(
+const BufferIterator<T, T_nonconst, elem_type>& that) {
     return _buffer == that._buffer && _pos == that._pos;
 }
 
-template<typename T, std::size_t N, typename Container>
-bool BufferIterator<T, N, Container>::operator!=(
-const BufferIterator<T, N, Container>& that) {
+template<typename T, typename T_nonconst, typename elem_type>
+bool BufferIterator<T, T_nonconst, elem_type>::operator!=(
+const BufferIterator<T, T_nonconst, elem_type>& that) {
     return !this->operator==(that);
 }
 
-template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>&
-BufferIterator<T, N, Container>::operator+=(const difference_type& n) {
+template<typename T, typename T_nonconst, typename elem_type>
+BufferIterator<T, T_nonconst, elem_type>&
+BufferIterator<T, T_nonconst, elem_type>::operator+=(const difference_type& n) {
     if (n >= 0) {
-        if (_pos < _buffer._gapStart && _buffer._gapStart <= _pos + n) {
-            _pos += (_buffer._gapEnd - _buffer._gapStart);
+        if (_pos < _buffer->_gapStart && _buffer->_gapStart <= _pos + n) {
+            _pos += (_buffer->_gapEnd - _buffer->_gapStart);
         }
     } else {
-        if (_pos + n <= _buffer._gapEnd && _buffer._gapEnd < _pos) {
-            _pos -= (_buffer._gapEnd - _buffer._gapStart);
+        if (_pos + n <= _buffer->_gapEnd && _buffer->_gapEnd < _pos) {
+            _pos -= (_buffer->_gapEnd - _buffer->_gapStart);
         }
     }
     _pos += n;
@@ -325,115 +332,115 @@ BufferIterator<T, N, Container>::operator+=(const difference_type& n) {
     return *this;
 }
 
-template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>
-BufferIterator<T, N, Container>::operator+(const difference_type& n) {
-    return BufferIterator<T, N, Container>(*this += n);
+template<typename T, typename T_nonconst, typename elem_type>
+BufferIterator<T, T_nonconst, elem_type>
+BufferIterator<T, T_nonconst, elem_type>::operator+(const difference_type& n) {
+    return BufferIterator<T, T_nonconst, elem_type>(*this += n);
 }
 
-template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>&
-BufferIterator<T, N, Container>::operator++() {
+template<typename T, typename T_nonconst, typename elem_type>
+BufferIterator<T, T_nonconst, elem_type>&
+BufferIterator<T, T_nonconst, elem_type>::operator++() {
     this->operator+(1);
     return *this;
 }
 
-template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>
-BufferIterator<T, N, Container>::operator++(int) {
-    BufferIterator<T, N, Container> tmp(*this);
+template<typename T, typename T_nonconst, typename elem_type>
+BufferIterator<T, T_nonconst, elem_type>
+BufferIterator<T, T_nonconst, elem_type>::operator++(int) {
+    BufferIterator<T, T_nonconst, elem_type> tmp(*this);
     operator++();
     return tmp;
 }
 
-template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>&
-BufferIterator<T, N, Container>::operator-=(const difference_type& n) {
+template<typename T, typename T_nonconst, typename elem_type>
+BufferIterator<T, T_nonconst, elem_type>&
+BufferIterator<T, T_nonconst, elem_type>::operator-=(const difference_type& n) {
     return *this += -n;
 }
 
-template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>
-BufferIterator<T, N, Container>::operator-(const difference_type& n) {
-        return BufferIterator<T, N, Container>(*this - n);
+template<typename T, typename T_nonconst, typename elem_type>
+BufferIterator<T, T_nonconst, elem_type>
+BufferIterator<T, T_nonconst, elem_type>::operator-(const difference_type& n) {
+        return BufferIterator<T, T_nonconst, elem_type>(*this - n);
     }
 
-template<typename T, std::size_t N, typename Container>
-BufferIterator<T, N, Container>& BufferIterator<T, N, Container>::operator--() {
+template<typename T, typename T_nonconst, typename elem_type>
+BufferIterator<T, T_nonconst, elem_type>& BufferIterator<T, T_nonconst, elem_type>::operator--() {
     this->operator-(1);
     return *this;
 }
 
-template<typename T, std::size_t N, typename Container>
-const BufferIterator<T, N, Container>&
-BufferIterator<T, N, Container>::operator--(int) {
-    BufferIterator<T, N, Container> tmp(*this);
+template<typename T, typename T_nonconst, typename elem_type>
+const BufferIterator<T, T_nonconst, elem_type>&
+BufferIterator<T, T_nonconst, elem_type>::operator--(int) {
+    BufferIterator<T, T_nonconst, elem_type> tmp(*this);
     operator--();
     return tmp;
 }
 
-template<typename T, std::size_t N, typename Container>
-typename BufferIterator<T, N, Container>::reference
-BufferIterator<T, N, Container>::operator*() const {
+template<typename T, typename T_nonconst, typename elem_type>
+typename BufferIterator<T, T_nonconst, elem_type>::reference
+BufferIterator<T, T_nonconst, elem_type>::operator*() const {
     return *_pos;
 }
 
-template<typename T, std::size_t N, typename Container>
-typename BufferIterator<T, N, Container>::pointer
-BufferIterator<T, N, Container>::operator->() const {
+template<typename T, typename T_nonconst, typename elem_type>
+typename BufferIterator<T, T_nonconst, elem_type>::pointer
+BufferIterator<T, T_nonconst, elem_type>::operator->() const {
     return _pos;
 }
 
-template<typename T, std::size_t N, typename Container>
-typename BufferIterator<T, N, Container>::reference
-BufferIterator<T, N, Container>::operator[](
+template<typename T, typename T_nonconst, typename elem_type>
+typename BufferIterator<T, T_nonconst, elem_type>::reference
+BufferIterator<T, T_nonconst, elem_type>::operator[](
 const size_type& n) const {
     return *(_pos + n);
 }
 
-template<typename T, std::size_t N, typename Container>
-bool std::operator<(const BufferIterator<T, N, Container>& lhs,
-const BufferIterator<T, N, Container>& rhs) {
+template<typename T, typename T_nonconst, typename elem_type>
+bool std::operator<(const BufferIterator<T, T_nonconst, elem_type>& lhs,
+const BufferIterator<T, T_nonconst, elem_type>& rhs) {
     return lhs._buffer == rhs._buffer && lhs._pos < rhs._pos;
 }
 
-template<typename T, std::size_t N, typename Container>
-bool std::operator>(const BufferIterator<T, N, Container>& lhs,
-const BufferIterator<T, N, Container>& rhs){
+template<typename T, typename T_nonconst, typename elem_type>
+bool std::operator>(const BufferIterator<T, T_nonconst, elem_type>& lhs,
+const BufferIterator<T, T_nonconst, elem_type>& rhs){
     return lhs._buffer == rhs._buffer && lhs._pos > rhs._pos;
 }
 
-template<typename T, std::size_t N, typename Container>
-bool std::operator<=(const BufferIterator<T, N, Container>& lhs,
-const BufferIterator<T, N, Container>& rhs) {
+template<typename T, typename T_nonconst, typename elem_type>
+bool std::operator<=(const BufferIterator<T, T_nonconst, elem_type>& lhs,
+const BufferIterator<T, T_nonconst, elem_type>& rhs) {
     return !operator>(lhs, rhs);
 }
 
-template<typename T, std::size_t N, typename Container>
-bool std::operator>=(const BufferIterator<T, N, Container>& lhs,
-const BufferIterator<T, N, Container>& rhs) {
+template<typename T, typename T_nonconst, typename elem_type>
+bool std::operator>=(const BufferIterator<T, T_nonconst, elem_type>& lhs,
+const BufferIterator<T, T_nonconst, elem_type>& rhs) {
     return !operator<(lhs, rhs);
 }
 
-template<typename T, std::size_t N, typename Container>
-typename BufferIterator<T, N, Container>::difference_type std::operator+(
-const BufferIterator<T, N, Container>& lhs,
-const BufferIterator<T, N, Container>& rhs) {
+template<typename T, typename T_nonconst, typename elem_type>
+typename BufferIterator<T, T_nonconst, elem_type>::difference_type std::operator+(
+const BufferIterator<T, T_nonconst, elem_type>& lhs,
+const BufferIterator<T, T_nonconst, elem_type>& rhs) {
     return lhs._pos + rhs._pos;
 }
 
-template<typename T, std::size_t N, typename Container>
-typename BufferIterator<T, N, Container>::difference_type
-std::operator-(const BufferIterator<T, N, Container>& lhs,
-const BufferIterator<T, N, Container>& rhs) {
+template<typename T, typename T_nonconst, typename elem_type>
+typename BufferIterator<T, T_nonconst, elem_type>::difference_type
+std::operator-(const BufferIterator<T, T_nonconst, elem_type>& lhs,
+const BufferIterator<T, T_nonconst, elem_type>& rhs) {
     return lhs._pos - rhs._pos;
 }
 
-template<typename T, std::size_t N, typename Container>
-void std::swap(BufferIterator<T, N, Container>& lhs,
-BufferIterator<T, N, Container>& rhs) {
+template<typename T, typename T_nonconst, typename elem_type>
+void std::swap(BufferIterator<T, T_nonconst, elem_type>& lhs,
+BufferIterator<T, T_nonconst, elem_type>& rhs) {
     if (&lhs != &rhs) {
-        lhs._buffer.swap(rhs._buffer);
+        lhs._buffer->swap(rhs._buffer);
         std::swap(lhs._pos, rhs._pos);
     }
 }
