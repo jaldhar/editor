@@ -34,6 +34,8 @@ public:
     using const_reference = const T&;
     using iterator = BufferIterator<self_type, self_type>;
     using const_iterator = BufferIterator<const self_type, self_type, const value_type>;
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     Buffer();
     Buffer(const self_type& that);
@@ -53,6 +55,15 @@ public:
 
     const_iterator cbegin() const;
     const_iterator cend() const;
+
+    reverse_iterator rbegin();
+    reverse_iterator rend();
+
+    const_reverse_iterator rbegin() const;
+    const_reverse_iterator rend() const;
+
+    const_reverse_iterator crbegin() const;
+    const_reverse_iterator crend() const;
 
     size_type capacity() const;
     bool      empty() const;

@@ -104,6 +104,42 @@ Buffer<T, N, Container>::cend() const {
 }
 
 template<typename T, std::size_t N, typename Container>
+typename Buffer<T, N, Container>::reverse_iterator
+Buffer<T, N, Container>::rbegin() {
+    return Buffer<T, N, Container>::reverse_iterator(end());
+}
+
+template<typename T, std::size_t N, typename Container>
+typename Buffer<T, N, Container>::reverse_iterator
+Buffer<T, N, Container>::rend() {
+    return Buffer<T, N, Container>::reverse_iterator(begin());
+}
+
+template<typename T, std::size_t N, typename Container>
+typename Buffer<T, N, Container>::const_reverse_iterator
+Buffer<T, N, Container>::rbegin() const {
+    return Buffer<T, N, Container>::const_reverse_iterator(end());
+}
+
+template<typename T, std::size_t N, typename Container>
+typename Buffer<T, N, Container>::const_reverse_iterator
+Buffer<T, N, Container>::rend() const {
+    return Buffer<T, N, Container>::const_reverse_iterator(begin());
+}
+
+template<typename T, std::size_t N, typename Container>
+typename Buffer<T, N, Container>::const_reverse_iterator
+Buffer<T, N, Container>::crbegin() const {
+    return rbegin();
+}
+
+template<typename T, std::size_t N, typename Container>
+typename Buffer<T, N, Container>::const_reverse_iterator
+Buffer<T, N, Container>::crend() const {
+    return rend();
+}
+
+template<typename T, std::size_t N, typename Container>
 typename Buffer<T, N, Container>::size_type
 Buffer<T, N, Container>::capacity() const {
     return _text.capacity();
