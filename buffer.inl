@@ -82,8 +82,7 @@ typename Buffer<T, N, Container>::iterator Buffer<T, N, Container>::end() {
 
 template<typename T, std::size_t N, typename Container>
 typename Buffer<T, N, Container>::const_iterator Buffer<T, N, Container>::begin() const {
-    return const_iterator(
-        *(const_cast<Buffer<T, N, Container> *>(this)));
+    return Buffer<T, N, Container>::const_iterator(this);
 }
 
 template<typename T, std::size_t N, typename Container>
@@ -232,6 +231,32 @@ bool Buffer<T, N, Container>::pointMove(int count) {
 }
 
 template<typename T, std::size_t N, typename Container>
+typename Buffer<T, N, Container>::difference_type
+Buffer<T, N, Container>::searchBackward(value_type c, difference_type pos) const {
+    auto i = crend();
+    i -= (pos + 1);
+    while (i++ != crend()) {
+        if (*i == c) {
+            return i.base().pos();
+        }
+    }
+    return npos;
+}
+
+template<typename T, std::size_t N, typename Container>
+typename Buffer<T, N, Container>::difference_type
+Buffer<T, N, Container>::searchForward(value_type c, difference_type pos) const {
+    auto i = cbegin();
+    i += pos;
+    while (i++ != cend()) {
+        if (*i == c) {
+            return i.pos();
+        }
+    }
+    return npos;
+}
+
+template<typename T, std::size_t N, typename Container>
 BufferInternals Buffer<T, N, Container>::internals() {
     return {
         capacity(),
@@ -313,7 +338,7 @@ _pos{nullptr} {
 template<typename T, typename T_nonconst, typename elem_type>
 BufferIterator<T, T_nonconst, elem_type>::BufferIterator(const T* buffer) :
 _buffer{buffer} {
-    auto b = const_cast<T*>(_buffer);
+    auto b = const_cast<T_nonconst *>(_buffer);
 
     if (b->_gapStart == b->_text.begin() && !b->empty()) {
         _pos = b->_gapEnd;
@@ -432,6 +457,12 @@ typename BufferIterator<T, T_nonconst, elem_type>::reference
 BufferIterator<T, T_nonconst, elem_type>::operator[](
 const size_type& n) const {
     return *(_pos + n);
+}
+
+template<typename T, typename T_nonconst, typename elem_type>
+typename BufferIterator<T, T_nonconst, elem_type>::difference_type
+BufferIterator<T, T_nonconst, elem_type>::pos() const {
+    return const_cast<T_nonconst *>(_buffer)->gapToUser(_pos);
 }
 
 template<typename T, typename T_nonconst, typename elem_type>

@@ -23,6 +23,10 @@ public:
     bool forward_char(bool& isArg, int& arg, bool& isExit, int c);
     bool backward_delete_char(bool& isArg, int& arg, bool& isExit, int c);
     bool delete_char(bool& isArg, int& arg, bool& isExit, int c);
+    bool beginning_of_line(bool& isArg, int& arg, bool& isExit, int c);
+    bool end_of_line(bool& isArg, int& arg, bool& isExit, int c);
+    bool next_line(bool& isArg, int& arg, bool& isExit, int c);
+    bool previous_line(bool& isArg, int& arg, bool& isExit, int c);
     bool quit(bool& isArg, int& arg, bool& isExit, int c);
 
 private:

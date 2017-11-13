@@ -23,6 +23,14 @@ _keymap {
     { KEY_BACKSPACE, &Subeditor::backward_delete_char },
     { 0x04, &Subeditor::delete_char }, // CTRL-d
     { KEY_DC, &Subeditor::delete_char },
+    { 0x01, &Subeditor::beginning_of_line }, // CTRL-a
+    { KEY_HOME, &Subeditor::beginning_of_line },
+    { 0x05, &Subeditor::end_of_line }, // CTRL-e
+    { KEY_END, &Subeditor::end_of_line },
+    { 0x0e, &Subeditor::next_line }, // CTRL-n
+    { KEY_DOWN, &Subeditor::next_line },
+    { 0x10, &Subeditor::previous_line }, // CTRL-p
+    { KEY_UP, &Subeditor::previous_line },
     { 0x11, &Subeditor::quit }, // CTRL-q
 }, _subeditor{subeditor}, _key{key}, _window{window} {
 }

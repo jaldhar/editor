@@ -37,6 +37,8 @@ public:
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+    static const difference_type npos = -1;
+
     Buffer();
     Buffer(const self_type& that);
     Buffer(self_type&& that);
@@ -78,6 +80,8 @@ public:
     difference_type point() const;
     bool            pointSet(difference_type n);
     bool            pointMove(int count);
+    difference_type searchBackward(value_type c, difference_type pos) const;
+    difference_type searchForward(value_type c, difference_type pos) const;
 
 
     BufferInternals internals();
@@ -133,6 +137,7 @@ public:
     pointer             operator->() const;
     reference           operator[](const size_type& n) const;
 
+    difference_type     pos() const;
 private:
     const buffer_type*  _buffer;
     pointer             _pos;

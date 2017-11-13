@@ -52,7 +52,7 @@ bool& /*isExit*/, int /*c*/) {
 }
 
 bool Subeditor::backward_delete_char(bool& /*isArg*/, int& arg,
-    bool& /*isExit*/, int /*c*/) {
+bool& /*isExit*/, int /*c*/) {
     while (arg-- > 0) {
         if (!_buffer.deletePrevious()) {
             break;
@@ -61,13 +61,65 @@ bool Subeditor::backward_delete_char(bool& /*isArg*/, int& arg,
     return true;
 }
 
-bool Subeditor::delete_char(bool& /*isArg*/, int& arg,
-    bool& /*isExit*/, int /*c*/) {
+bool Subeditor::delete_char(bool& /*isArg*/, int& arg, bool& /*isExit*/,
+int /*c*/) {
     while (arg-- > 0) {
         if (!_buffer.deleteNext()) {
             break;
         }
     }
+    return true;
+}
+
+bool Subeditor::beginning_of_line(bool& /*isArg*/, int& /*arg*/,
+bool& /*isExit*/, int /*c*/) {
+    auto result = _buffer.searchBackward('\n', _buffer.point());
+
+    if (result == _buffer.npos) {
+        _buffer.pointSet(_buffer.begin().pos());
+    } else {
+        _buffer.pointSet(result + 1);
+    }
+
+    return true;
+}
+
+bool Subeditor::end_of_line(bool& /*isArg*/, int& /*arg*/, bool& /*isExit*/,
+int /*c*/) {
+    auto result = _buffer.searchForward('\n', _buffer.point());
+
+    if (result == _buffer.npos) {
+        _buffer.pointSet(_buffer.end().pos());
+    } else {
+        _buffer.pointSet(result - 1);
+    }
+
+    return true;
+}
+
+bool Subeditor::next_line(bool& /*isArg*/, int& /*arg*/, bool& /*isExit*/,
+int /*c*/) {
+    auto result = _buffer.searchForward('\n', _buffer.point());
+
+    if (result == _buffer.npos) {
+        _buffer.pointSet(_buffer.end().pos());
+    } else {
+        _buffer.pointSet(result + 1);
+    }
+
+    return true;
+}
+
+bool Subeditor::previous_line(bool& /*isArg*/, int& /*arg*/, bool& /*isExit*/,
+int /*c*/) {
+    auto result = _buffer.searchBackward('\n', _buffer.point());
+
+    if (result == _buffer.npos) {
+        _buffer.pointSet(_buffer.begin().pos());
+    } else {
+        _buffer.pointSet(result - 1);
+    }
+
     return true;
 }
 
