@@ -42,7 +42,7 @@ public:
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    static const difference_type npos = -1;
+    static const size_type npos = -1;
 
     Buffer() : _text(N, 0), _point{0}, _gapStart{_text.begin()},
     _gapEnd{_text.end()} {
@@ -174,7 +174,7 @@ public:
     }
 
     bool deletePrevious() {
-        if (_point <= 0 || _point > static_cast<difference_type>(size())) {
+        if (_point <= 0 || _point > size()) {
             return false;
         }
 
@@ -184,7 +184,7 @@ public:
     }
 
     bool deleteNext() {
-        if (_point < 0 || _point >= static_cast<difference_type>(size())) {
+        if (_point < 0 || _point >= size()) {
             return false;
         }
 
@@ -194,7 +194,7 @@ public:
     }
 
     bool insert(value_type c) {
-        if (_point < 0 || _point > static_cast<difference_type>(size())) {
+        if (_point < 0 || _point > size()) {
             return false;
         }
 
@@ -208,14 +208,14 @@ public:
         return _point;
     }
 
-    bool pointSet(difference_type n) {
+    bool pointSet(size_type n) {
         _point = n;
         return true;
     }
 
     bool pointMove(int count) {
-        difference_type loc = _point + count;
-        if (loc < 0 || loc > static_cast<difference_type>(size())) {
+        size_type loc = _point + count;
+        if (loc < 0 || loc > size()) {
             return false;
         }
 
@@ -223,7 +223,7 @@ public:
         return true;
     }
 
-    difference_type searchBackward(value_type c, difference_type pos) const {
+    size_type searchBackward(value_type c, size_type pos) const {
         auto i = cbegin() + pos;
 
         while (i > cbegin()) {
@@ -236,7 +236,7 @@ public:
         return npos;
     }
 
-    difference_type searchForward(value_type c, difference_type pos) const {
+    size_type searchForward(value_type c, size_type pos) const {
         auto i = cbegin() + pos;
 
         while (i <= cend()) {
@@ -264,7 +264,7 @@ private:
     friend const_iterator;
 
     Container                    _text;
-    difference_type              _point;
+    size_type                    _point;
     container_iterator           _gapStart;
     container_iterator           _gapEnd;
 
@@ -296,7 +296,7 @@ private:
         }
     }
 
-    container_iterator userToGap(difference_type p) {
+    container_iterator userToGap(size_type p) {
         container_iterator i = _text.begin() + p;
 
         if (i >= _gapStart) {
@@ -306,14 +306,18 @@ private:
         return i;
     }
 
-    difference_type gapToUser(container_iterator i) {
+    size_type gapToUser(container_iterator i) {
         difference_type p = distance(_text.begin(), i);
 
         if (i >= _gapEnd) {
             p -= (_gapEnd - _gapStart);
         }
 
-        return p;
+        if (p < 0) {
+            p = 0;
+        }
+
+        return static_cast<size_type>(p);
     }
 };
 
@@ -322,7 +326,7 @@ template<typename T, typename T_nonconst, typename elem_type>
 class BufferIterator {
 public:
     // Iterator traits, previously from std::iterator.
-    using self_type = BufferIterator<T, T_nonconst, elem_type>;
+    using self_type         = BufferIterator<T, T_nonconst, elem_type>;
     using buffer_type       = T;
     using value_type        = typename buffer_type::value_type;
     using size_type         = typename buffer_type::size_type;
@@ -427,8 +431,8 @@ public:
         return *(_pos + n);
     }
 
-    difference_type pos() const {
-        return const_cast<T_nonconst *>(_buffer)->gapToUser(_pos);
+    size_type pos() const {
+       return const_cast<T_nonconst *>(_buffer)->gapToUser(_pos);
     }
 
     template<typename U, typename U_nonconst, typename elem>
