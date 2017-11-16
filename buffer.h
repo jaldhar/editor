@@ -14,31 +14,30 @@
 #include <vector>
 
 struct BufferInternals {
-    size_t    _capacity;
-    ptrdiff_t _point;
-    size_t    _size;
-    ptrdiff_t _gapStart;
-    ptrdiff_t _gapEnd;
+    std::size_t    _capacity;
+    std::ptrdiff_t _point;
+    std::size_t    _size;
+    std::ptrdiff_t _gapStart;
+    std::ptrdiff_t _gapEnd;
 };
 
-template<typename T, typename T_nonconst = std::remove_cv_t<T>,
-    typename elem_type = typename T::value_type> class BufferIterator;
+template<typename T, bool isConst> class BufferIterator;
 
 template<typename T,  std::size_t N, typename Container = std::vector<T>>
 class Buffer {
 public:
     using self_type = Buffer<T, N, Container>;
     using container_iterator = typename Container::iterator;
+    using container_const_iterator = typename Container::const_iterator;
     using value_type = T;
-    using size_type = size_t;
-    using difference_type = ptrdiff_t;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
     using pointer = T*;
     using const_pointer = const T*;
     using reference = T&;
     using const_reference = const T&;
-    using iterator = BufferIterator<self_type>;
-    using const_iterator =
-        BufferIterator<const self_type, self_type, const value_type>;
+    using iterator = BufferIterator<self_type, false>;
+    using const_iterator = BufferIterator<const self_type, true>;
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -276,7 +275,7 @@ private:
             _gapEnd = _text.end();
         }
 
-        container_iterator p = userToGap(_point);
+        container_const_iterator p = userToGap(_point);
         if (p == _gapStart) {
             return;
         }
@@ -306,8 +305,8 @@ private:
         return i;
     }
 
-    size_type gapToUser(container_iterator i) {
-        difference_type p = distance(_text.begin(), i);
+    size_type gapToUser(container_const_iterator i) const {
+        difference_type p = i - _text.begin();
 
         if (i >= _gapEnd) {
             p -= (_gapEnd - _gapStart);
@@ -322,35 +321,42 @@ private:
 };
 
 
-template<typename T, typename T_nonconst, typename elem_type>
+template<typename T, bool isConst>
 class BufferIterator {
 public:
     // Iterator traits, previously from std::iterator.
-    using self_type         = BufferIterator<T, T_nonconst, elem_type>;
-    using buffer_type       = T;
-    using value_type        = typename buffer_type::value_type;
-    using size_type         = typename buffer_type::size_type;
-    using difference_type   = typename buffer_type::difference_type;
-    using pointer           = typename buffer_type::container_iterator;
+    using self_type         = BufferIterator<T, isConst>;
+    using value_type        = typename T::value_type;
+    using size_type         = typename T::size_type;
+    using difference_type   = typename T::difference_type;
+    using pointer           = typename T::pointer;
     using const_pointer     = const pointer;
-    using reference         = typename buffer_type::reference;
+    using reference         = typename T::reference;
     using const_reference   = const reference;
     using iterator_category = std::random_access_iterator_tag;
+    using buffer_ptr_type   =
+        typename std::conditional<isConst, const T*, T*>::type;
+    using value_ref_type    =
+        typename std::conditional<isConst,const value_type&, value_type&>::type;
+    using container_type    =
+        typename std::conditional<isConst,const value_type, value_type>::type;
 
     BufferIterator() : _buffer{nullptr}, _pos{nullptr} {
     }
 
-    BufferIterator(const T* buffer) : _buffer{buffer} {
-        auto b = const_cast<T_nonconst *>(_buffer);
-
-        if (b->_gapStart == b->_text.begin() && !b->empty()) {
-            _pos = b->_gapEnd;
+    BufferIterator(buffer_ptr_type buffer) : _buffer{buffer} {
+        if (_buffer->_gapStart == _buffer->_text.begin() && !_buffer->empty()) {
+            _pos = _buffer->_gapEnd;
         } else {
-            _pos = b->_text.begin();
+            // we have to go through all these convulutions just to assign the
+            // value of a const iterator to an iterator.
+            std::advance(_pos,
+                std::distance<typename T::container_const_iterator>(_pos,
+                    _buffer->_text.begin()));
         }
     }
 
-    BufferIterator(const BufferIterator<T, T_nonconst, elem_type>& that) :
+    BufferIterator(const BufferIterator<T, false>& that) :
     _buffer(that._buffer), _pos{that._pos} {
     }
 
@@ -386,7 +392,7 @@ public:
     }
 
     self_type operator+(const difference_type& n) {
-        return BufferIterator<T, T_nonconst, elem_type>(*this += n);
+        return BufferIterator<T, isConst>(*this) += n;
     }
 
     self_type& operator++() {
@@ -405,7 +411,7 @@ public:
     }
 
     self_type operator-(const difference_type& n) {
-        return BufferIterator<T, T_nonconst, elem_type>(*this - n);
+        return BufferIterator<T, isConst>(*this) -= n;
     }
 
     self_type& operator--() {
@@ -413,13 +419,13 @@ public:
         return *this;
     }
 
-    const self_type& operator--(int) {
+    self_type operator--(int) {
         self_type tmp(*this);
         operator--();
         return tmp;
     }
 
-    reference operator*() const {
+    value_ref_type operator*() const {
         return *_pos;
     }
 
@@ -427,99 +433,101 @@ public:
         return _pos;
     }
 
-    reference operator[](const size_type& n) const {
+    value_ref_type operator[](const size_type& n) const {
         return *(_pos + n);
     }
 
     size_type pos() const {
-       return const_cast<T_nonconst *>(_buffer)->gapToUser(_pos);
+        return _buffer->gapToUser(_pos);
     }
 
-    template<typename U, typename U_nonconst, typename elem>
+    template<typename U, bool U_isConst>
     friend bool std::operator<(
-    const BufferIterator<U, U_nonconst, elem>& lhs,
-    const BufferIterator<U, U_nonconst, elem>& rhs);
+    const BufferIterator<U, U_isConst>& lhs,
+    const BufferIterator<U, U_isConst>& rhs);
 
-    template<typename U, typename U_nonconst, typename elem>
+    template<typename U, bool U_isConst>
     friend bool std::operator>(
-    const BufferIterator<U, U_nonconst, elem>& lhs,
-    const BufferIterator<U, U_nonconst, elem>& rhs);
+    const BufferIterator<U, U_isConst>& lhs,
+    const BufferIterator<U, U_isConst>& rhs);
 
-    template<typename U, typename U_nonconst, typename elem>
+    template<typename U, bool U_isConst>
     friend bool std::operator<=(
-    const BufferIterator<U, U_nonconst, elem>& lhs,
-    const BufferIterator<U, U_nonconst, elem>& rhs);
+    const BufferIterator<U, U_isConst>& lhs,
+    const BufferIterator<U, U_isConst>& rhs);
 
-    template<typename U, typename U_nonconst, typename elem>
+    template<typename U, bool U_isConst>
     friend bool std::operator>=(
-    const BufferIterator<U, U_nonconst, elem>& lhs,
-    const BufferIterator<U, U_nonconst, elem>& rhs);
+    const BufferIterator<U, U_isConst>& lhs,
+    const BufferIterator<U, U_isConst>& rhs);
 
-    template<typename U, typename U_nonconst, typename elem>
+    template<typename U, bool U_isConst>
     friend difference_type std::operator+(
-    const BufferIterator<U, U_nonconst, elem>& lhs,
-    const BufferIterator<U, U_nonconst, elem>& rhs);
+    const BufferIterator<U, U_isConst>& lhs,
+    const BufferIterator<U, U_isConst>& rhs);
 
-    template<typename U, typename U_nonconst, typename elem>
+    template<typename U, bool U_isConst>
     friend difference_type std::operator-(
-    const BufferIterator<U, U_nonconst, elem>& lhs,
-    const BufferIterator<U, U_nonconst, elem>& rhs);
+    const BufferIterator<U, U_isConst>& lhs,
+    const BufferIterator<U, U_isConst>& rhs);
 
-    template<typename U, typename U_nonconst, typename elem>
+    template<typename U, bool U_isConst>
     friend void std::swap(
-    const BufferIterator<U, U_nonconst, elem>& lhs,
-    const BufferIterator<U, U_nonconst, elem>& rhs);
+    const BufferIterator<U, U_isConst>& lhs,
+    const BufferIterator<U, U_isConst>& rhs);
+
+    friend class BufferIterator<T, true>;
 
 private:
-    const buffer_type*  _buffer;
-    pointer             _pos;
+    buffer_ptr_type                             _buffer;
+    typename T::container_iterator              _pos;
 
 };
 
 namespace std {
-    template<typename T, typename T_nonconst, typename elem_type>
-    inline bool operator<(const BufferIterator<T, T_nonconst, elem_type>& lhs,
-    const BufferIterator<T, T_nonconst, elem_type>& rhs) {
+    template<typename T, bool isConst>
+    inline bool operator<(const BufferIterator<T, isConst>& lhs,
+    const BufferIterator<T, isConst>& rhs) {
         return lhs._buffer == rhs._buffer && lhs._pos < rhs._pos;
     }
 
-    template<typename T, typename T_nonconst, typename elem_type>
-    inline bool operator>(const BufferIterator<T, T_nonconst, elem_type>& lhs,
-    const BufferIterator<T, T_nonconst, elem_type>& rhs) {
+    template<typename T, bool isConst>
+    inline bool operator>(const BufferIterator<T, isConst>& lhs,
+    const BufferIterator<T, isConst>& rhs) {
         return lhs._buffer == rhs._buffer && lhs._pos > rhs._pos;
     }
 
-    template<typename T, typename T_nonconst, typename elem_type>
-    inline bool operator<=(const BufferIterator<T, T_nonconst, elem_type>& lhs,
-    const BufferIterator<T, T_nonconst, elem_type>& rhs) {
+    template<typename T, bool isConst>
+    inline bool operator<=(const BufferIterator<T, isConst>& lhs,
+    const BufferIterator<T, isConst>& rhs) {
         return !operator>(lhs, rhs);
     }
 
-    template<typename T, typename T_nonconst, typename elem_type>
-    inline bool operator>=(const BufferIterator<T, T_nonconst, elem_type>& lhs,
-    const BufferIterator<T, T_nonconst, elem_type>& rhs) {
+    template<typename T, bool isConst>
+    inline bool operator>=(const BufferIterator<T, isConst>& lhs,
+    const BufferIterator<T, isConst>& rhs) {
     return !operator<(lhs, rhs);
     }
 
-    template<typename T, typename T_nonconst, typename elem_type>
-    inline typename BufferIterator<T, T_nonconst, elem_type>::difference_type
+    template<typename T, bool isConst>
+    inline typename BufferIterator<T, isConst>::difference_type
     operator+(
-    const BufferIterator<T, T_nonconst, elem_type>& lhs,
-    const BufferIterator<T, T_nonconst, elem_type>& rhs) {
+    const BufferIterator<T, isConst>& lhs,
+    const BufferIterator<T, isConst>& rhs) {
         return lhs._pos + rhs._pos;
     }
 
-    template<typename T, typename T_nonconst, typename elem_type>
-    inline typename BufferIterator<T, T_nonconst, elem_type>::difference_type
+    template<typename T, bool isConst>
+    inline typename BufferIterator<T, isConst>::difference_type
     operator-(
-    const BufferIterator<T, T_nonconst, elem_type>& lhs,
-    const BufferIterator<T, T_nonconst, elem_type>& rhs) {
+    const BufferIterator<T, isConst>& lhs,
+    const BufferIterator<T, isConst>& rhs) {
     return lhs._pos - rhs._pos;
 }
 
-    template<typename T, typename T_nonconst, typename elem_type>
-    inline void swap(BufferIterator<T, T_nonconst, elem_type>& lhs,
-    BufferIterator<T, T_nonconst, elem_type>& rhs) {
+    template<typename T, bool isConst>
+    inline void swap(BufferIterator<T, isConst>& lhs,
+    BufferIterator<T, isConst>& rhs) {
         if (&lhs != &rhs) {
             lhs._buffer->swap(rhs._buffer);
             std::swap(lhs._pos, rhs._pos);
