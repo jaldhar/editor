@@ -222,29 +222,23 @@ public:
         return true;
     }
 
-    size_type searchBackward(value_type c, size_type pos) const {
-        auto i = cbegin() + pos;
-
-        while (i > cbegin()) {
+    size_type searchBackward(value_type c, size_type pos) {
+        auto i = rend();
+        for(i -= (pos + 1); i < rend(); i += 1) {
             if (*i == c) {
-                return i.pos();
+                return i.base().pos();
             }
-            --i;
         }
-
         return npos;
     }
 
-    size_type searchForward(value_type c, size_type pos) const {
-        auto i = cbegin() + pos;
-
-        while (i <= cend()) {
+    size_type searchForward(value_type c, size_type pos) {
+        auto i = begin();
+        for(i += pos; i < end(); i += 1) {
             if (*i == c) {
                 return i.pos();
             }
-            ++i;
         }
-
         return npos;
     }
 
