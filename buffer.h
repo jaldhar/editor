@@ -223,8 +223,7 @@ public:
     }
 
     size_type searchBackward(value_type c, size_type pos) {
-        auto i = rend();
-        for(i -= (pos + 1); i < rend(); i += 1) {
+        for(auto i = rend() - (pos + 1); i < rend(); i++) {
             if (*i == c) {
                 return i.base().pos();
             }
@@ -233,8 +232,7 @@ public:
     }
 
     size_type searchForward(value_type c, size_type pos) {
-        auto i = begin();
-        for(i += pos; i < end(); i += 1) {
+        for(auto i = begin() + pos; i < end(); i++) {
             if (*i == c) {
                 return i.pos();
             }
@@ -385,12 +383,12 @@ public:
         return *this;
     }
 
-    self_type operator+(const difference_type& n) {
+    self_type operator+(const difference_type& n) const {
         return BufferIterator<T, isConst>(*this) += n;
     }
 
     self_type& operator++() {
-        this->operator+(1);
+        this->operator+=(1);
         return *this;
     }
 
@@ -404,12 +402,12 @@ public:
         return *this += -n;
     }
 
-    self_type operator-(const difference_type& n) {
+    self_type operator-(const difference_type& n) const {
         return BufferIterator<T, isConst>(*this) -= n;
     }
 
     self_type& operator--() {
-        this->operator-(1);
+        this->operator-=(1);
         return *this;
     }
 
